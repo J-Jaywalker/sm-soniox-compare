@@ -23,6 +23,7 @@ class SpeechmaticsProvider(BaseProvider):
         self._receiver: asyncio.Task[Any] | None = None
         self._num_sent_chunks = 0
         self.first_word: bool = True
+        self._active_audio_events: dict[str, Any] = {}
 
     async def connect(self) -> None:
         if self._is_connected:
@@ -64,6 +65,7 @@ class SpeechmaticsProvider(BaseProvider):
 
             self._is_connected = True
             self._num_sent_chunks = 0
+            self._active_audio_events = {}
             self._sender = asyncio.create_task(self._send_loop())
             self._receiver = asyncio.create_task(self._recv_loop())
 
@@ -122,6 +124,12 @@ class SpeechmaticsProvider(BaseProvider):
             "audio_format": audio_format,
             "transcription_config": transcription,
         }
+
+        if self.config.params.enable_audio_events:
+            audio_events_cfg: dict = {}
+            if self.config.params.audio_event_types:
+                audio_events_cfg["types"] = self.config.params.audio_event_types
+            msg["audio_events_config"] = audio_events_cfg
 
         if self.config.params.mode == "mt":
             translation = self.config.params.translation
@@ -293,6 +301,30 @@ class SpeechmaticsProvider(BaseProvider):
                                 "parts": parts,
                             }
                         )
+                elif msg_type == "AudioEventStarted":
+                    event = data.get("event", {})
+                    event_type = event.get("type", "unknown")
+                    start_time = event.get("start_time", 0)
+                    confidence = event.get("confidence", 0)
+                    self._active_audio_events[event_type] = {
+                        "start_time": start_time,
+                        "confidence": confidence,
+                    }
+                    await self.host_queue.put({
+                        "type": "data",
+                        "provider": self.config.service.provider_name,
+                        "parts": [make_part(
+                            text=f" [{event_type}]",
+                            is_final=True,
+                            start_ms=start_time * 1000,
+                        )],
+                    })
+
+                elif msg_type == "AudioEventEnded":
+                    event = data.get("event", {})
+                    event_type = event.get("type", "unknown")
+                    self._active_audio_events.pop(event_type, None)
+
                 elif msg_type == "error":
                     await self._error(data.get("error", "Unknown error"))
         except Exception as ex:
@@ -342,5 +374,5 @@ class SpeechmaticsProvider(BaseProvider):
             real_time_latency_config=supported,  # https://docs.speechmatics.com/features/realtime-latency
             speaker_identification=unsupported,
             turn_detection=unsupported,
-            audio_events=unsupported,
+            audio_events=supported,
         )

@@ -8,6 +8,7 @@ import type { ProviderName } from "@/lib/provider-features";
 
 import { FeatureComparisonDialog } from "../feature-comparison-dialog";
 import { CustomDictionaryDialog, type VocabEntry } from "../custom-dictionary-dialog";
+import { AudioEventsDialog, type AudioEventType, ALL_AUDIO_EVENT_TYPES } from "../audio-events-dialog";
 import { cn } from "@/lib/utils";
 
 const SectionLabel = ({
@@ -36,6 +37,8 @@ export const ControlPanel: React.FC = () => {
     setOperatingPoint,
     setEnableCustomDictionary,
     setAdditionalVocab,
+    setEnableAudioEvents,
+    setAudioEventTypes,
   } = useUrlSettings();
   const {
     selectedProviders = [],
@@ -43,6 +46,8 @@ export const ControlPanel: React.FC = () => {
     operatingPoint,
     enableCustomDictionary,
     additionalVocab,
+    enableAudioEvents,
+    audioEventTypes,
   } = settings;
 
   const vocabEntries = useMemo<VocabEntry[]>(() => {
@@ -54,9 +59,18 @@ export const ControlPanel: React.FC = () => {
     }
   }, [additionalVocab]);
 
+  const selectedAudioEventTypes = useMemo<AudioEventType[]>(() => {
+    if (!audioEventTypes) return [];
+    try {
+      return JSON.parse(audioEventTypes) as AudioEventType[];
+    } catch {
+      return [];
+    }
+  }, [audioEventTypes]);
+
   const [dictDialogOpen, setDictDialogOpen] = React.useState(false);
+  const [audioEventsDialogOpen, setAudioEventsDialogOpen] = React.useState(false);
   const [enableSpeakerIdentification, setEnableSpeakerIdentification] = React.useState(false);
-  const [enableAudioEvents, setEnableAudioEvents] = React.useState(false);
 
   const isRecording = recordingState === "recording";
   const isStarting = recordingState === "starting";
@@ -85,12 +99,6 @@ export const ControlPanel: React.FC = () => {
       checked: enableSpeakerIdentification,
       onChange: setEnableSpeakerIdentification,
     },
-    {
-      id: "enable-audio-events",
-      label: "Audio Events",
-      checked: enableAudioEvents,
-      onChange: setEnableAudioEvents,
-    },
   ];
 
   const handleCustomDictChange = (checked: boolean | "indeterminate") => {
@@ -107,6 +115,26 @@ export const ControlPanel: React.FC = () => {
       setEnableCustomDictionary(true);
     }
   };
+
+  const handleAudioEventsChange = (checked: boolean | "indeterminate") => {
+    const isChecked = checked === true;
+    setEnableAudioEvents(isChecked);
+    if (isChecked) {
+      setAudioEventsDialogOpen(true);
+    }
+  };
+
+  const handleAudioEventTypesSave = (types: AudioEventType[]) => {
+    setAudioEventTypes(types.length > 0 ? JSON.stringify(types) : "");
+  };
+
+  // Label showing which event types are active
+  const audioEventsLabel = (() => {
+    if (!enableAudioEvents) return null;
+    if (selectedAudioEventTypes.length === 0) return "all events";
+    if (selectedAudioEventTypes.length === ALL_AUDIO_EVENT_TYPES.length) return "all events";
+    return selectedAudioEventTypes.join(", ");
+  })();
 
   return (
     <div className="h-full flex flex-col bg-[#101211]">
@@ -271,6 +299,50 @@ export const ControlPanel: React.FC = () => {
                   </span>
                 </label>
               ))}
+
+              {/* Audio Events — special row with Edit button */}
+              <div
+                className={cn(
+                  "flex items-center gap-3 px-3 py-2.5 border rounded-[4px] transition-all duration-150 select-none",
+                  enableAudioEvents
+                    ? "border-[#29a383]/40 bg-[#29a383]/8"
+                    : "border-[#2e3330] hover:border-[#29a383]/25 hover:bg-[#29a383]/4",
+                  (isRecording || isStarting) &&
+                    "opacity-40 cursor-not-allowed pointer-events-none"
+                )}
+              >
+                <Checkbox
+                  id="enable-audio-events"
+                  checked={enableAudioEvents}
+                  onCheckedChange={handleAudioEventsChange}
+                  disabled={isRecording || isStarting}
+                  className="border-[#37403e] data-[state=checked]:bg-[#29a383] data-[state=checked]:border-[#29a383] shrink-0 cursor-pointer"
+                />
+                <label
+                  htmlFor="enable-audio-events"
+                  className="flex-1 min-w-0 cursor-pointer"
+                >
+                  <span className="text-[0.82rem] font-medium text-[#e6edeb]">
+                    Audio Events
+                  </span>
+                  {audioEventsLabel && (
+                    <span className="ml-1.5 text-[0.68rem] text-[#5f6e6a] truncate">
+                      · {audioEventsLabel}
+                    </span>
+                  )}
+                </label>
+                {enableAudioEvents && (
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setAudioEventsDialogOpen(true);
+                    }}
+                    className="px-2 py-0.5 rounded-[3px] border border-[#2e3330] text-[0.7rem] font-medium text-[#b4c3be] hover:border-[#29a383]/50 hover:text-[#29a383] hover:bg-[#29a383]/6 transition-all duration-150 shrink-0 cursor-pointer"
+                  >
+                    Edit
+                  </button>
+                )}
+              </div>
             </div>
 
             <div className="pt-1 hidden sm:flex w-full">
@@ -287,6 +359,13 @@ export const ControlPanel: React.FC = () => {
         onOpenChange={setDictDialogOpen}
         initialEntries={vocabEntries}
         onSave={handleVocabSave}
+      />
+
+      <AudioEventsDialog
+        open={audioEventsDialogOpen}
+        onOpenChange={setAudioEventsDialogOpen}
+        initialTypes={selectedAudioEventTypes}
+        onSave={handleAudioEventTypesSave}
       />
     </div>
   );

@@ -91,6 +91,8 @@ class ProviderParams(BaseModel):
     enable_language_identification: bool = True
     enable_endpoint_detection: bool = True
     additional_vocab: list[dict] = []
+    enable_audio_events: bool = False
+    audio_event_types: list[str] = []  # empty = all types
     translation: TranslationConfig | None = Field(default_factory=TranslationConfig)
 
 

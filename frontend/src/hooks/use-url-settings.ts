@@ -32,6 +32,8 @@ export interface UrlSettings {
   enableEndpointDetection: boolean;
   enableCustomDictionary: boolean;
   additionalVocab: string;
+  enableAudioEvents: boolean;
+  audioEventTypes: string;
   translationType: TranslationType;
   selectedFileName: string | null;
 }
@@ -88,6 +90,8 @@ const settingParsers = {
   ),
   enableCustomDictionary: parseAsBoolean.withDefault(false),
   additionalVocab: parseAsString.withDefault(""),
+  enableAudioEvents: parseAsBoolean.withDefault(false),
+  audioEventTypes: parseAsString.withDefault(""),
   translationType: parseAsStringLiteral(translationTypeLiterals).withDefault(
     defaultTranslationType
   ),
@@ -123,6 +127,13 @@ export function useUrlSettings() {
 
     if (settings.enableCustomDictionary && settings.additionalVocab) {
       params.set("additional_vocab", settings.additionalVocab);
+    }
+
+    if (settings.enableAudioEvents) {
+      params.set("enable_audio_events", "true");
+      if (settings.audioEventTypes) {
+        params.set("audio_event_types", settings.audioEventTypes);
+      }
     }
     params.set(
       "enable_language_identification",
@@ -202,6 +213,10 @@ export function useUrlSettings() {
       setSettings({ enableCustomDictionary: enabled }),
     setAdditionalVocab: (vocab: string) =>
       setSettings({ additionalVocab: vocab }),
+    setEnableAudioEvents: (enabled: boolean) =>
+      setSettings({ enableAudioEvents: enabled }),
+    setAudioEventTypes: (types: string) =>
+      setSettings({ audioEventTypes: types }),
     setTranslationType: (type: TranslationType) =>
       setSettings({ translationType: type }),
     setSelectedFileName: (fileName: string | null) =>

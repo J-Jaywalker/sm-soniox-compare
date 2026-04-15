@@ -64,6 +64,27 @@ export const TranscriptRenderer: React.FC<TranscriptRendererProps> = ({
     const elementsArray: React.ReactNode[] = [];
 
     parts.forEach((part, index) => {
+      // Audio event block header — rendered like a speaker change, not inline
+      const audioEventMatch = part.text.trim().match(/^\[(\w+)\]$/);
+      if (audioEventMatch) {
+        const eventLabel = audioEventMatch[1];
+        elementsArray.push(
+          <div
+            key={`${keyPrefix}-audio-event-${index}`}
+            className="mt-3 mb-0.5"
+          >
+            <span className="text-[0.68rem] font-bold uppercase tracking-[0.08em] text-[#5f6e6a]">
+              Audio Event:{" "}
+              <span className="text-[#b4c3be]">
+                {eventLabel.charAt(0).toUpperCase() + eventLabel.slice(1)}
+              </span>
+            </span>
+          </div>
+        );
+        previousPartSpeaker = null; // force speaker re-display after an event
+        return;
+      }
+
       const partSpeaker = part.speaker || null;
       const partLanguage = part.language || null;
       const partTranslationStatus = part.translation_status || null;

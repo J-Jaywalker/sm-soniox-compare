@@ -88,6 +88,12 @@ async def compare_websocket(
     additional_vocab: str = Query(
         default="", description="Additional vocabulary as JSON array"
     ),
+    enable_audio_events: bool = Query(
+        default=False, description="Enable audio event detection"
+    ),
+    audio_event_types: str = Query(
+        default="", description="Audio event types as JSON array (empty = all)"
+    ),
 ):
     await websocket.accept()
 
@@ -112,6 +118,13 @@ async def compare_websocket(
             except Exception:
                 pass
 
+        parsed_audio_event_types: list[str] = []
+        if audio_event_types:
+            try:
+                parsed_audio_event_types = json.loads(audio_event_types)
+            except Exception:
+                pass
+
         provider_params = ProviderParams(
             mode=mode,
             language_hints=language_hints,
@@ -121,6 +134,8 @@ async def compare_websocket(
             enable_language_identification=enable_language_identification,
             enable_endpoint_detection=enable_endpoint_detection,
             additional_vocab=parsed_vocab,
+            enable_audio_events=enable_audio_events,
+            audio_event_types=parsed_audio_event_types,
             translation=translation_cfg if mode == "mt" else None,
         )
 
