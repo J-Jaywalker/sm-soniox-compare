@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useMemo } from "react";
 import { Checkbox } from "@/components/ui/checkbox";
 import { useUrlSettings } from "@/hooks/use-url-settings";
 import { useComparison } from "@/contexts/comparison-context";
@@ -7,6 +7,7 @@ import { useFeatures } from "@/contexts/feature-context";
 import type { ProviderName } from "@/lib/provider-features";
 
 import { FeatureComparisonDialog } from "../feature-comparison-dialog";
+import { CustomDictionaryDialog, type VocabEntry } from "../custom-dictionary-dialog";
 import { cn } from "@/lib/utils";
 
 const SectionLabel = ({
@@ -33,14 +34,27 @@ export const ControlPanel: React.FC = () => {
     setSelectedProviders,
     setEnableSpeakerDiarization,
     setOperatingPoint,
+    setEnableCustomDictionary,
+    setAdditionalVocab,
   } = useUrlSettings();
   const {
     selectedProviders = [],
     enableSpeakerDiarization,
     operatingPoint,
+    enableCustomDictionary,
+    additionalVocab,
   } = settings;
 
-  const [enableCustomDictionary, setEnableCustomDictionary] = React.useState(false);
+  const vocabEntries = useMemo<VocabEntry[]>(() => {
+    if (!additionalVocab) return [];
+    try {
+      return JSON.parse(additionalVocab) as VocabEntry[];
+    } catch {
+      return [];
+    }
+  }, [additionalVocab]);
+
+  const [dictDialogOpen, setDictDialogOpen] = React.useState(false);
   const [enableSpeakerIdentification, setEnableSpeakerIdentification] = React.useState(false);
   const [enableAudioEvents, setEnableAudioEvents] = React.useState(false);
 
@@ -66,12 +80,6 @@ export const ControlPanel: React.FC = () => {
       onChange: setEnableSpeakerDiarization,
     },
     {
-      id: "enable-custom-dictionary",
-      label: "Custom Dictionary",
-      checked: enableCustomDictionary,
-      onChange: setEnableCustomDictionary,
-    },
-    {
       id: "enable-speaker-identification",
       label: "Speaker Identification",
       checked: enableSpeakerIdentification,
@@ -84,6 +92,21 @@ export const ControlPanel: React.FC = () => {
       onChange: setEnableAudioEvents,
     },
   ];
+
+  const handleCustomDictChange = (checked: boolean | "indeterminate") => {
+    const isChecked = checked === true;
+    setEnableCustomDictionary(isChecked);
+    if (isChecked && vocabEntries.length === 0) {
+      setDictDialogOpen(true);
+    }
+  };
+
+  const handleVocabSave = (entries: VocabEntry[]) => {
+    setAdditionalVocab(entries.length > 0 ? JSON.stringify(entries) : "");
+    if (entries.length > 0) {
+      setEnableCustomDictionary(true);
+    }
+  };
 
   return (
     <div className="h-full flex flex-col bg-[#101211]">
@@ -186,6 +209,43 @@ export const ControlPanel: React.FC = () => {
           <section className="px-4 py-5 space-y-3">
             <SectionLabel>Settings</SectionLabel>
             <div className="space-y-1.5">
+              {/* Custom Dictionary — special row with Edit button */}
+              <div
+                className={cn(
+                  "flex items-center gap-3 px-3 py-2.5 border rounded-[4px] transition-all duration-150 select-none",
+                  enableCustomDictionary
+                    ? "border-[#29a383]/40 bg-[#29a383]/8"
+                    : "border-[#2e3330] hover:border-[#29a383]/25 hover:bg-[#29a383]/4",
+                  (isRecording || isStarting) &&
+                    "opacity-40 cursor-not-allowed pointer-events-none"
+                )}
+              >
+                <Checkbox
+                  id="enable-custom-dictionary"
+                  checked={enableCustomDictionary}
+                  onCheckedChange={handleCustomDictChange}
+                  disabled={isRecording || isStarting}
+                  className="border-[#37403e] data-[state=checked]:bg-[#29a383] data-[state=checked]:border-[#29a383] shrink-0 cursor-pointer"
+                />
+                <label
+                  htmlFor="enable-custom-dictionary"
+                  className="flex-1 text-[0.82rem] font-medium text-[#e6edeb] cursor-pointer"
+                >
+                  Custom Dictionary
+                </label>
+                {enableCustomDictionary && (
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setDictDialogOpen(true);
+                    }}
+                    className="px-2 py-0.5 rounded-[3px] border border-[#2e3330] text-[0.7rem] font-medium text-[#b4c3be] hover:border-[#29a383]/50 hover:text-[#29a383] hover:bg-[#29a383]/6 transition-all duration-150 shrink-0 cursor-pointer"
+                  >
+                    Edit
+                  </button>
+                )}
+              </div>
+
               {settingsItems.map(({ id, label, checked, onChange }) => (
                 <label
                   key={id}
@@ -221,6 +281,13 @@ export const ControlPanel: React.FC = () => {
       </div>
 
       <ActionPanel />
+
+      <CustomDictionaryDialog
+        open={dictDialogOpen}
+        onOpenChange={setDictDialogOpen}
+        initialEntries={vocabEntries}
+        onSave={handleVocabSave}
+      />
     </div>
   );
 };

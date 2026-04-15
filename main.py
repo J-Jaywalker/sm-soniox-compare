@@ -1,5 +1,6 @@
 import asyncio
 import importlib
+import json
 import os
 from typing import Dict, List, Any
 
@@ -84,6 +85,9 @@ async def compare_websocket(
     translation_type: str = Query(
         default="one_way", description="Type of translation (one_way/two_way)"
     ),
+    additional_vocab: str = Query(
+        default="", description="Additional vocabulary as JSON array"
+    ),
 ):
     await websocket.accept()
 
@@ -101,6 +105,13 @@ async def compare_websocket(
                 type=translation_type,
             )
 
+        parsed_vocab: list[dict] = []
+        if additional_vocab:
+            try:
+                parsed_vocab = json.loads(additional_vocab)
+            except Exception:
+                pass
+
         provider_params = ProviderParams(
             mode=mode,
             language_hints=language_hints,
@@ -109,6 +120,7 @@ async def compare_websocket(
             enable_speaker_diarization=enable_speaker_diarization,
             enable_language_identification=enable_language_identification,
             enable_endpoint_detection=enable_endpoint_detection,
+            additional_vocab=parsed_vocab,
             translation=translation_cfg if mode == "mt" else None,
         )
 

@@ -30,6 +30,8 @@ export interface UrlSettings {
   enableSpeakerDiarization: boolean;
   enableLanguageIdentification: boolean;
   enableEndpointDetection: boolean;
+  enableCustomDictionary: boolean;
+  additionalVocab: string;
   translationType: TranslationType;
   selectedFileName: string | null;
 }
@@ -84,6 +86,8 @@ const settingParsers = {
   enableEndpointDetection: parseAsBoolean.withDefault(
     defaultEnableEndpointDetection
   ),
+  enableCustomDictionary: parseAsBoolean.withDefault(false),
+  additionalVocab: parseAsString.withDefault(""),
   translationType: parseAsStringLiteral(translationTypeLiterals).withDefault(
     defaultTranslationType
   ),
@@ -116,6 +120,10 @@ export function useUrlSettings() {
       "enable_speaker_diarization",
       String(settings.enableSpeakerDiarization)
     );
+
+    if (settings.enableCustomDictionary && settings.additionalVocab) {
+      params.set("additional_vocab", settings.additionalVocab);
+    }
     params.set(
       "enable_language_identification",
       String(settings.enableLanguageIdentification)
@@ -190,6 +198,10 @@ export function useUrlSettings() {
       setSettings({ enableLanguageIdentification: enabled }),
     setEnableEndpointDetection: (enabled: boolean) =>
       setSettings({ enableEndpointDetection: enabled }),
+    setEnableCustomDictionary: (enabled: boolean) =>
+      setSettings({ enableCustomDictionary: enabled }),
+    setAdditionalVocab: (vocab: string) =>
+      setSettings({ additionalVocab: vocab }),
     setTranslationType: (type: TranslationType) =>
       setSettings({ translationType: type }),
     setSelectedFileName: (fileName: string | null) =>

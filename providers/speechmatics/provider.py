@@ -108,6 +108,15 @@ class SpeechmaticsProvider(BaseProvider):
         if self.config.params.enable_speaker_diarization:
             transcription["diarization"] = "speaker"
 
+        if self.config.params.additional_vocab:
+            vocab = []
+            for entry in self.config.params.additional_vocab:
+                item = {"content": entry["content"]}
+                if entry.get("sounds_like"):
+                    item["sounds_like"] = entry["sounds_like"]
+                vocab.append(item)
+            transcription["additional_vocab"] = vocab
+
         msg = {
             "message": "StartRecognition",
             "audio_format": audio_format,
