@@ -107,8 +107,19 @@ class SpeechmaticsProvider(BaseProvider):
             "max_delay": 0.7,
             "enable_partials": False,
         }
-        if self.config.params.enable_speaker_diarization:
+        if (self.config.params.enable_speaker_diarization
+                or self.config.params.enrolled_speakers):
             transcription["diarization"] = "speaker"
+            if self.config.params.enrolled_speakers:
+                transcription["speaker_diarization_config"] = {
+                    "speakers": [
+                        {
+                            "label": s["label"],
+                            "speaker_identifiers": s["identifiers"],
+                        }
+                        for s in self.config.params.enrolled_speakers
+                    ],
+                }
 
         if self.config.params.additional_vocab:
             vocab = []
@@ -231,8 +242,16 @@ class SpeechmaticsProvider(BaseProvider):
                             word_props = alternatives[0]
                             text = word_props.get("content")
                             confidence = word_props.get("confidence")
-                            if word_props.get("speaker") is not None:
-                                speaker = word_props.get("speaker")[-1]
+                            raw_speaker = word_props.get("speaker")
+                            if raw_speaker is not None:
+                                import re
+                                m = re.match(
+                                    r'^S(\d+)$', str(raw_speaker)
+                                )
+                                speaker = (
+                                    int(m.group(1)) if m
+                                    else str(raw_speaker)
+                                )
 
                             if self.first_word and content_type == "word":
                                 self.first_word = False
@@ -275,8 +294,16 @@ class SpeechmaticsProvider(BaseProvider):
                         start_time_s = translation.get("start_time")
                         end_time_s = translation.get("end_time")
                         if msg_type == "AddTranslation":
-                            if translation.get("speaker") is not None:
-                                speaker = translation.get("speaker")[-1]
+                            raw_speaker = translation.get("speaker")
+                            if raw_speaker is not None:
+                                import re
+                                m = re.match(
+                                    r'^S(\d+)$', str(raw_speaker)
+                                )
+                                speaker = (
+                                    int(m.group(1)) if m
+                                    else str(raw_speaker)
+                                )
 
                         assert isinstance(content, str)
                         content = content.strip()
@@ -327,6 +354,13 @@ class SpeechmaticsProvider(BaseProvider):
 
                 elif msg_type == "error":
                     await self._error(data.get("error", "Unknown error"))
+
+                elif msg_type == "SpeakersResult":
+                    await self.host_queue.put({
+                        "type": "speakers_result",
+                        "provider": self.config.service.provider_name,
+                        "speakers": data.get("speakers", []),
+                    })
         except Exception as ex:
             self.error = ex
             await self._error(ex)

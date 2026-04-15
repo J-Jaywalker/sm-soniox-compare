@@ -34,6 +34,7 @@ export interface UrlSettings {
   additionalVocab: string;
   enableAudioEvents: boolean;
   audioEventTypes: string;
+  enableSpeakerIdentification: boolean;
   translationType: TranslationType;
   selectedFileName: string | null;
 }
@@ -92,6 +93,7 @@ const settingParsers = {
   additionalVocab: parseAsString.withDefault(""),
   enableAudioEvents: parseAsBoolean.withDefault(false),
   audioEventTypes: parseAsString.withDefault(""),
+  enableSpeakerIdentification: parseAsBoolean.withDefault(false),
   translationType: parseAsStringLiteral(translationTypeLiterals).withDefault(
     defaultTranslationType
   ),
@@ -135,6 +137,10 @@ export function useUrlSettings() {
         params.set("audio_event_types", settings.audioEventTypes);
       }
     }
+    params.set(
+      "enable_speaker_identification",
+      String(settings.enableSpeakerIdentification)
+    );
     params.set(
       "enable_language_identification",
       String(settings.enableLanguageIdentification)
@@ -215,6 +221,8 @@ export function useUrlSettings() {
       setSettings({ additionalVocab: vocab }),
     setEnableAudioEvents: (enabled: boolean) =>
       setSettings({ enableAudioEvents: enabled }),
+    setEnableSpeakerIdentification: (enabled: boolean) =>
+      setSettings({ enableSpeakerIdentification: enabled }),
     setAudioEventTypes: (types: string) =>
       setSettings({ audioEventTypes: types }),
     setTranslationType: (type: TranslationType) =>

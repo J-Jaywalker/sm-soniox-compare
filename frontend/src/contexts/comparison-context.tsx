@@ -17,7 +17,7 @@ import { useUrlSettings } from "../hooks/use-url-settings";
 const USE_MOCK_DATA = false;
 export interface TranscriptPart {
   text: string;
-  speaker?: number | null;
+  speaker?: number | string | null;
   language?: string | null;
   translation_status?: "original" | "translation";
   start_ms?: number | null;
@@ -77,7 +77,7 @@ type ComparisonContextType = ComparisonContextState & ComparisonContextActions;
 interface BackendTranscriptPart {
   text: string;
   is_final: boolean;
-  speaker?: number | null;
+  speaker?: number | string | null;
   language?: string | null;
   translation_status?: "original" | "translation";
   start_ms?: number | null;

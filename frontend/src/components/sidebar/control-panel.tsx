@@ -8,7 +8,9 @@ import type { ProviderName } from "@/lib/provider-features";
 
 import { FeatureComparisonDialog } from "../feature-comparison-dialog";
 import { CustomDictionaryDialog, type VocabEntry } from "../custom-dictionary-dialog";
-import { AudioEventsDialog, type AudioEventType, ALL_AUDIO_EVENT_TYPES } from "../audio-events-dialog";
+import { AudioEventsDialog, type AudioEventType } from "../audio-events-dialog";
+import { EnrollSpeakerDialog } from "../enroll-speaker-dialog";
+import { ManageSpeakersDialog } from "../manage-speakers-dialog";
 import { cn } from "@/lib/utils";
 
 const SectionLabel = ({
@@ -39,6 +41,7 @@ export const ControlPanel: React.FC = () => {
     setAdditionalVocab,
     setEnableAudioEvents,
     setAudioEventTypes,
+    setEnableSpeakerIdentification,
   } = useUrlSettings();
   const {
     selectedProviders = [],
@@ -48,6 +51,7 @@ export const ControlPanel: React.FC = () => {
     additionalVocab,
     enableAudioEvents,
     audioEventTypes,
+    enableSpeakerIdentification,
   } = settings;
 
   const vocabEntries = useMemo<VocabEntry[]>(() => {
@@ -70,7 +74,8 @@ export const ControlPanel: React.FC = () => {
 
   const [dictDialogOpen, setDictDialogOpen] = React.useState(false);
   const [audioEventsDialogOpen, setAudioEventsDialogOpen] = React.useState(false);
-  const [enableSpeakerIdentification, setEnableSpeakerIdentification] = React.useState(false);
+  const [enrollDialogOpen, setEnrollDialogOpen] = React.useState(false);
+  const [manageDialogOpen, setManageDialogOpen] = React.useState(false);
 
   const isRecording = recordingState === "recording";
   const isStarting = recordingState === "starting";
@@ -92,12 +97,6 @@ export const ControlPanel: React.FC = () => {
       label: "Speaker diarization",
       checked: enableSpeakerDiarization,
       onChange: setEnableSpeakerDiarization,
-    },
-    {
-      id: "enable-speaker-identification",
-      label: "Speaker Identification",
-      checked: enableSpeakerIdentification,
-      onChange: setEnableSpeakerIdentification,
     },
   ];
 
@@ -293,6 +292,56 @@ export const ControlPanel: React.FC = () => {
                 </label>
               ))}
 
+              {/* Speaker Identification — special row with Enroll/Manage buttons */}
+              <div
+                className={cn(
+                  "flex items-center gap-3 px-3 py-2.5 border rounded-[4px] transition-all duration-150 select-none",
+                  enableSpeakerIdentification
+                    ? "border-[#29a383]/40 bg-[#29a383]/8"
+                    : "border-[#2e3330] hover:border-[#29a383]/25 hover:bg-[#29a383]/4",
+                  (isRecording || isStarting) &&
+                    "opacity-40 cursor-not-allowed pointer-events-none"
+                )}
+              >
+                <Checkbox
+                  id="enable-speaker-identification"
+                  checked={enableSpeakerIdentification}
+                  onCheckedChange={(c) =>
+                    setEnableSpeakerIdentification(Boolean(c))
+                  }
+                  disabled={isRecording || isStarting}
+                  className="border-[#37403e] data-[state=checked]:bg-[#29a383] data-[state=checked]:border-[#29a383] shrink-0 cursor-pointer"
+                />
+                <label
+                  htmlFor="enable-speaker-identification"
+                  className="flex-1 text-[0.82rem] font-medium text-[#e6edeb] cursor-pointer"
+                >
+                  Speaker Identification
+                </label>
+                {enableSpeakerIdentification && (
+                  <div className="flex gap-1.5">
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setEnrollDialogOpen(true);
+                      }}
+                      className="px-2 py-0.5 rounded-[3px] border border-[#2e3330] text-[0.7rem] font-medium text-[#b4c3be] hover:border-[#29a383]/50 hover:text-[#29a383] hover:bg-[#29a383]/6 transition-all duration-150 shrink-0 cursor-pointer"
+                    >
+                      Enroll
+                    </button>
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setManageDialogOpen(true);
+                      }}
+                      className="px-2 py-0.5 rounded-[3px] border border-[#2e3330] text-[0.7rem] font-medium text-[#b4c3be] hover:border-[#29a383]/50 hover:text-[#29a383] hover:bg-[#29a383]/6 transition-all duration-150 shrink-0 cursor-pointer"
+                    >
+                      Manage
+                    </button>
+                  </div>
+                )}
+              </div>
+
               {/* Audio Events — special row with Edit button */}
               <div
                 className={cn(
@@ -354,6 +403,20 @@ export const ControlPanel: React.FC = () => {
         onOpenChange={setAudioEventsDialogOpen}
         initialTypes={selectedAudioEventTypes}
         onSave={handleAudioEventTypesSave}
+      />
+
+      <EnrollSpeakerDialog
+        open={enrollDialogOpen}
+        onOpenChange={setEnrollDialogOpen}
+        operatingPoint={operatingPoint}
+        onEnrolled={() => {
+          // Speaker enrolled successfully — dialog closes itself
+        }}
+      />
+
+      <ManageSpeakersDialog
+        open={manageDialogOpen}
+        onOpenChange={setManageDialogOpen}
       />
     </div>
   );

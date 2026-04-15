@@ -10,8 +10,9 @@ from fastapi.responses import HTMLResponse, PlainTextResponse, FileResponse
 from fastapi.templating import Jinja2Templates
 from fastapi.staticfiles import StaticFiles
 
-from config import get_provider_config
+from config import get_provider_config, get_speechmatics_service_config
 from providers.base_provider import BaseProvider
+from providers import speaker_store
 from utils import error_message
 
 from providers.deepgram.provider import DeepgramProvider
@@ -94,6 +95,9 @@ async def compare_websocket(
     audio_event_types: str = Query(
         default="", description="Audio event types as JSON array (empty = all)"
     ),
+    enable_speaker_identification: bool = Query(
+        default=False, description="Enable speaker identification"
+    ),
 ):
     await websocket.accept()
 
@@ -136,8 +140,17 @@ async def compare_websocket(
             additional_vocab=parsed_vocab,
             enable_audio_events=enable_audio_events,
             audio_event_types=parsed_audio_event_types,
+            enable_speaker_identification=enable_speaker_identification,
             translation=translation_cfg if mode == "mt" else None,
         )
+
+        if enable_speaker_identification:
+            enrolled = speaker_store.get_all()
+            provider_params.enable_speaker_identification = True
+            provider_params.enrolled_speakers = [
+                {"label": s["label"], "identifiers": s["identifiers"]}
+                for s in enrolled
+            ]
 
         # --- BEGIN DEBUG PRINT ---
         print("--------------------------------------")
@@ -267,6 +280,128 @@ def health() -> str:
 @app.get("/.well-known/version/soniox-compare", response_class=PlainTextResponse)
 def version() -> str:
     return os.getenv("VERSION", "")
+
+
+@app.get("/compare/api/speakers")
+async def list_speakers():
+    return {"speakers": speaker_store.get_all()}
+
+
+@app.post("/compare/api/speakers")
+async def save_speaker(body: dict):
+    speaker = speaker_store.add(body["label"], body["identifiers"])
+    return speaker
+
+
+@app.delete("/compare/api/speakers/{speaker_id}")
+async def delete_speaker(speaker_id: str):
+    speaker_store.remove(speaker_id)
+    return {"success": True}
+
+
+@app.websocket("/compare/api/enroll-speaker")
+async def enroll_speaker(
+    websocket: WebSocket,
+    operating_point: str = Query(default="enhanced"),
+):
+    await websocket.accept()
+    try:
+        svc = get_speechmatics_service_config()
+    except Exception as e:
+        await websocket.send_json(
+            {"type": "error", "message": f"Config error: {e}"}
+        )
+        return
+
+    start_msg = {
+        "message": "StartRecognition",
+        "audio_format": {
+            "type": "raw",
+            "encoding": "pcm_s16le",
+            "sample_rate": 16000,
+        },
+        "transcription_config": {
+            "language": "en",
+            "operating_point": operating_point,
+            "diarization": "speaker",
+            "speaker_diarization_config": {"get_speakers": True},
+        },
+    }
+
+    try:
+        import websockets as ws_lib
+        headers = {"Authorization": f"Bearer {svc.api_key}"}
+        async with ws_lib.connect(
+            svc.websocket_url, additional_headers=headers
+        ) as sm_ws:
+            await sm_ws.send(json.dumps(start_msg))
+            num_chunks = 0
+            done = asyncio.Event()
+
+            async def recv_sm():
+                try:
+                    async for raw in sm_ws:
+                        data = json.loads(raw)
+                        mtype = data.get("message")
+                        if mtype == "SpeakersResult":
+                            await websocket.send_json({
+                                "type": "speakers_result",
+                                "speakers": data.get("speakers", []),
+                            })
+                            done.set()
+                            return
+                        elif mtype == "error":
+                            await websocket.send_json({
+                                "type": "error",
+                                "message": data.get(
+                                    "reason", "Unknown error"
+                                ),
+                            })
+                            done.set()
+                            return
+                except Exception as e:
+                    try:
+                        await websocket.send_json(
+                            {"type": "error", "message": str(e)}
+                        )
+                    except Exception:
+                        pass
+                    done.set()
+
+            recv_task = asyncio.create_task(recv_sm())
+            try:
+                while True:
+                    frame = await websocket.receive()
+                    if frame.get("type") == "websocket.disconnect":
+                        break
+                    if "bytes" in frame:
+                        await sm_ws.send(frame["bytes"])
+                        num_chunks += 1
+                    elif frame.get("text") == "END":
+                        await sm_ws.send(json.dumps({
+                            "message": "EndOfStream",
+                            "last_seq_no": num_chunks,
+                        }))
+                        await asyncio.wait_for(
+                            done.wait(), timeout=30.0
+                        )
+                        break
+            except asyncio.TimeoutError:
+                await websocket.send_json({
+                    "type": "error",
+                    "message": "Timed out waiting for speaker result",
+                })
+            except Exception:
+                pass
+            finally:
+                recv_task.cancel()
+    except Exception as e:
+        try:
+            await websocket.send_json(
+                {"type": "error", "message": f"Connection failed: {e}"}
+            )
+        except Exception:
+            pass
 
 
 if os.path.exists("frontend/dist"):

@@ -93,6 +93,8 @@ class ProviderParams(BaseModel):
     additional_vocab: list[dict] = []
     enable_audio_events: bool = False
     audio_event_types: list[str] = []  # empty = all types
+    enable_speaker_identification: bool = False
+    enrolled_speakers: list[dict] = []  # [{"label": str, "identifiers": [str]}]
     translation: TranslationConfig | None = Field(default_factory=TranslationConfig)
 
 

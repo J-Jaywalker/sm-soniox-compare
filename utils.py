@@ -33,7 +33,7 @@ def info_message(provider: str, message: str, level: str = "info") -> dict:
 def make_part(
     text: str,
     is_final: bool = True,
-    speaker: int | None = None,
+    speaker: int | str | None = None,
     language: str | None = None,
     start_ms: int | None = None,
     end_ms: int | None = None,

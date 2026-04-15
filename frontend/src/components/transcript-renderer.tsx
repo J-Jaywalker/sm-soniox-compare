@@ -107,8 +107,21 @@ export const TranscriptRenderer: React.FC<TranscriptRendererProps> = ({
 
       let headerWasDrawnThisIteration = false;
       if (displaySpeakerName) {
-        const headerDivColor =
-          SPEAKER_COLORS[(Number(partSpeaker) - 1) % SPEAKER_COLORS.length];
+        const colorIndex =
+          typeof partSpeaker === "number"
+            ? (partSpeaker - 1) % SPEAKER_COLORS.length
+            : Math.abs(
+                [...String(partSpeaker)].reduce(
+                  (h, c) => (h * 31 + c.charCodeAt(0)) | 0,
+                  0
+                )
+              ) % SPEAKER_COLORS.length;
+        const headerDivColor = SPEAKER_COLORS[colorIndex];
+
+        const speakerLabel =
+          typeof partSpeaker === "number"
+            ? `SPEAKER ${partSpeaker}`
+            : String(partSpeaker);
 
         elementsArray.push(
           <div
@@ -117,7 +130,7 @@ export const TranscriptRenderer: React.FC<TranscriptRendererProps> = ({
             style={{ color: headerDivColor }}
           >
             <span key="spk-name" className="font-semibold uppercase text-sm">
-              SPEAKER {partSpeaker}
+              {speakerLabel}
             </span>
           </div>
         );
