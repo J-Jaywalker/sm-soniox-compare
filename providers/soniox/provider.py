@@ -183,6 +183,7 @@ class SonioxProvider(BaseProvider):
     @staticmethod
     def get_available_features():
         supported = FeatureStatus.supported()
+        unsupported = FeatureStatus.unsupported()
         return SupportedFeatures(
             name="Soniox",
             model="stt-rt-preview",
