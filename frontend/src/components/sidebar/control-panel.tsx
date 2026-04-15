@@ -1,4 +1,4 @@
-import React, { useMemo } from "react";
+import React, { useMemo, useRef, useEffect } from "react";
 import { Checkbox } from "@/components/ui/checkbox";
 import { useUrlSettings } from "@/hooks/use-url-settings";
 import { useComparison } from "@/contexts/comparison-context";
@@ -76,6 +76,19 @@ export const ControlPanel: React.FC = () => {
   const [audioEventsDialogOpen, setAudioEventsDialogOpen] = React.useState(false);
   const [enrollDialogOpen, setEnrollDialogOpen] = React.useState(false);
   const [manageDialogOpen, setManageDialogOpen] = React.useState(false);
+  const [secretMenuOpen, setSecretMenuOpen] = React.useState(false);
+  const headerRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (!secretMenuOpen) return;
+    const handleClick = (e: MouseEvent) => {
+      if (headerRef.current && !headerRef.current.contains(e.target as Node)) {
+        setSecretMenuOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClick);
+    return () => document.removeEventListener("mousedown", handleClick);
+  }, [secretMenuOpen]);
 
   const isRecording = recordingState === "recording";
   const isStarting = recordingState === "starting";
@@ -130,14 +143,47 @@ export const ControlPanel: React.FC = () => {
 
   return (
     <div className="h-full flex flex-col bg-[#101211]">
-      {/* Brand header */}
-      <div className="shrink-0 px-4 py-3.5 bg-[#0D3C48]">
-        <h2 className="text-sm font-semibold tracking-tight text-white">
-          Speechmatics Compare
-        </h2>
-        <p className="text-[0.72rem] text-white/45 mt-0.5">
-          Real-time ASR comparison
-        </p>
+      {/* Brand header — click to reveal secret enrolment menu */}
+      <div
+        ref={headerRef}
+        className="shrink-0 px-4 py-3.5 bg-[#0D3C48] cursor-pointer select-none"
+        onClick={() => setSecretMenuOpen((o) => !o)}
+      >
+        <div className="relative">
+          {/* Always rendered to hold the height */}
+          <h2 className={cn("text-sm font-semibold tracking-tight text-white", secretMenuOpen && "invisible")}>
+            Speechmatics Compare
+          </h2>
+          <p className={cn("text-[0.72rem] text-white/45 mt-0.5", secretMenuOpen && "invisible")}>
+            Real-time ASR comparison
+          </p>
+          {/* Secret menu overlaid when open */}
+          {secretMenuOpen && (
+            <div
+              className="absolute inset-0 flex items-center gap-2"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <button
+                onClick={() => setEnrollDialogOpen(true)}
+                className="px-3 py-1.5 rounded-[3px] border border-white/20 text-[0.75rem] font-medium text-white/80 hover:border-white/50 hover:text-white hover:bg-white/8 transition-all duration-150"
+              >
+                Enroll Speaker
+              </button>
+              <button
+                onClick={() => setManageDialogOpen(true)}
+                className="px-3 py-1.5 rounded-[3px] border border-white/20 text-[0.75rem] font-medium text-white/80 hover:border-white/50 hover:text-white hover:bg-white/8 transition-all duration-150"
+              >
+                Manage
+              </button>
+              <button
+                onClick={() => setSecretMenuOpen(false)}
+                className="px-3 py-1.5 rounded-[3px] border border-white/10 text-[0.75rem] font-medium text-white/40 hover:border-white/30 hover:text-white/70 transition-all duration-150 ml-auto"
+              >
+                Back
+              </button>
+            </div>
+          )}
+        </div>
       </div>
 
       {/* Scrollable content */}
@@ -318,28 +364,6 @@ export const ControlPanel: React.FC = () => {
                 >
                   Speaker Identification
                 </label>
-                {enableSpeakerIdentification && (
-                  <div className="flex gap-1.5">
-                    <button
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        setEnrollDialogOpen(true);
-                      }}
-                      className="px-2 py-0.5 rounded-[3px] border border-[#2e3330] text-[0.7rem] font-medium text-[#b4c3be] hover:border-[#29a383]/50 hover:text-[#29a383] hover:bg-[#29a383]/6 transition-all duration-150 shrink-0 cursor-pointer"
-                    >
-                      Enroll
-                    </button>
-                    <button
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        setManageDialogOpen(true);
-                      }}
-                      className="px-2 py-0.5 rounded-[3px] border border-[#2e3330] text-[0.7rem] font-medium text-[#b4c3be] hover:border-[#29a383]/50 hover:text-[#29a383] hover:bg-[#29a383]/6 transition-all duration-150 shrink-0 cursor-pointer"
-                    >
-                      Manage
-                    </button>
-                  </div>
-                )}
               </div>
 
               {/* Audio Events — special row with Edit button */}
