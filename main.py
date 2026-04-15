@@ -56,9 +56,10 @@ async def compare_websocket(
         default="stt", description="Mode of operation (stt/mt)"
     ),
     language_hints: List[str] = Query(
-        default=[], description="Hints for input languages"
+        default=["en"], description="Hints for input languages"
     ),
     context: str = Query(default="", description="Context for transcription"),
+    operating_point: str = Query(default="enhanced", description="Operating point (standard/enhanced)"),
     enable_speaker_diarization: bool = Query(
         default=False, description="Enable speaker diarization"
     ),
@@ -104,6 +105,7 @@ async def compare_websocket(
             mode=mode,
             language_hints=language_hints,
             context=context,
+            operating_point=operating_point,
             enable_speaker_diarization=enable_speaker_diarization,
             enable_language_identification=enable_language_identification,
             enable_endpoint_detection=enable_endpoint_detection,

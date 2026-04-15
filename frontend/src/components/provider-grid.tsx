@@ -18,7 +18,7 @@ import { TranscriptRenderer } from "./transcript-renderer";
 
 export const ProviderGrid: React.FC = () => {
   const { settings } = useUrlSettings();
-  const { selectedProviders = [] } = settings;
+  const { selectedProviders = [], operatingPoint } = settings;
 
   const { providerOutputs, appError } = useComparison();
   const {
@@ -132,12 +132,16 @@ export const ProviderGrid: React.FC = () => {
         };
         const panelTitle =
           providerFeatures?.[providerName]?.name ?? providerName;
+        const panelSubtitle =
+          providerName === "speechmatics"
+            ? `realtime-${operatingPoint}`
+            : providerFeatures?.[providerName]?.model;
 
         return (
           <TooltipProvider key={providerName}>
             <Panel
               title={panelTitle}
-              subtitle={providerFeatures?.[providerName]?.model}
+              subtitle={panelSubtitle}
               titleTooltip={getProviderFeaturesTextTable(providerName)}
               className={providerName === PRIMARY_PROVIDER ? "text-soniox" : ""}
               // trailingElement={renderWarningTooltip(providerName)} // Removed for now

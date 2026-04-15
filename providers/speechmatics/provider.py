@@ -101,9 +101,9 @@ class SpeechmaticsProvider(BaseProvider):
         """Construct the initial StartRecognition message."""
         transcription = {
             "language": language,
-            "operating_point": "enhanced",
+            "operating_point": self.config.params.operating_point,
             "max_delay": 0.7,
-            "enable_partials": True,
+            "enable_partials": False,
         }
         if self.config.params.enable_speaker_diarization:
             transcription["diarization"] = "speaker"

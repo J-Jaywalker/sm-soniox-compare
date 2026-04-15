@@ -22,8 +22,8 @@ export const OPERATION_MODES = [
 
 export interface UrlSettings {
   mode: "stt" | "mt";
-  languageHints: string[];
   context: string;
+  operatingPoint: "standard" | "enhanced";
   targetTranslationLanguage: string;
   sourceTranslationLanguages: string[];
   selectedProviders: ProviderName[];
@@ -35,8 +35,8 @@ export interface UrlSettings {
 }
 
 const defaultMode = OPERATION_MODES[0].value;
-const defaultLanguageHints: string[] = ["en"];
 const defaultContext: string = "";
+const defaultOperatingPoint = "enhanced" as const;
 const defaultTargetTranslationLanguage = "es";
 const defaultSourceTranslationLanguages: string[] = ["en"];
 const defaultTranslationLanguageA = "en";
@@ -60,11 +60,12 @@ const modeLiterals = OPERATION_MODES.map((m) => m.value) as ReadonlyArray<
 const providerLiterals = ALL_PROVIDERS_LIST as ReadonlyArray<ProviderName>;
 const translationTypeLiterals = ["one_way", "two_way"] as const;
 
+const operatingPointLiterals = ["standard", "enhanced"] as const;
+
 const settingParsers = {
   mode: parseAsStringLiteral(modeLiterals).withDefault(defaultMode),
-  languageHints:
-    parseAsArrayOf(parseAsString).withDefault(defaultLanguageHints),
   context: parseAsString.withDefault(defaultContext),
+  operatingPoint: parseAsStringLiteral(operatingPointLiterals).withDefault(defaultOperatingPoint),
   targetTranslationLanguage: parseAsString.withDefault(
     defaultTargetTranslationLanguage
   ),
@@ -105,17 +106,12 @@ export function useUrlSettings() {
 
     params.set("mode", settings.mode);
 
-    if (
-      settings.mode !== "mt" &&
-      settings.languageHints &&
-      settings.languageHints.length > 0
-    ) {
-      settings.languageHints.forEach((hint) =>
-        params.append("language_hints", hint)
-      );
+    if (settings.mode !== "mt") {
+      params.append("language_hints", "en");
     }
 
     params.set("context", settings.context || "");
+    params.set("operating_point", settings.operatingPoint);
     params.set(
       "enable_speaker_diarization",
       String(settings.enableSpeakerDiarization)
@@ -179,9 +175,9 @@ export function useUrlSettings() {
     isValid,
     setSettings,
     setMode: (mode: UrlSettings["mode"]) => setSettings({ mode }),
-    setLanguageHints: (hints: string[]) =>
-      setSettings({ languageHints: hints }),
     setContext: (text: string) => setSettings({ context: text }),
+    setOperatingPoint: (point: "standard" | "enhanced") =>
+      setSettings({ operatingPoint: point }),
     setTargetTranslationLanguage: (lang: string) =>
       setSettings({ targetTranslationLanguage: lang }),
     setSourceTranslationLanguages: (langs: string[]) =>

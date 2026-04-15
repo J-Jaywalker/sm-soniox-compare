@@ -1,15 +1,11 @@
 import React from "react";
 import { Checkbox } from "@/components/ui/checkbox";
-import { TooltipProvider } from "@/components/ui/tooltip";
-import { Info } from "lucide-react";
 import { useUrlSettings } from "@/hooks/use-url-settings";
 import { useComparison } from "@/contexts/comparison-context";
 import { ActionPanel } from "./action-panel";
-import { useModelData } from "@/contexts/model-data-context";
-import { SearchSelect } from "@/components/ui/search-select";
 import { useFeatures } from "@/contexts/feature-context";
 import type { ProviderName } from "@/lib/provider-features";
-import { ResponsiveTooltip } from "../ui/responsive-tooltip";
+
 import { FeatureComparisonDialog } from "../feature-comparison-dialog";
 import { cn } from "@/lib/utils";
 
@@ -31,24 +27,22 @@ const SectionLabel = ({
 export const ControlPanel: React.FC = () => {
   const { recordingState } = useComparison();
   const { providerFeatures, availableComparisonProviders } = useFeatures();
-  const { modelInfo } = useModelData();
 
   const {
     settings,
     setSelectedProviders,
-    setLanguageHints,
     setEnableSpeakerDiarization,
+    setOperatingPoint,
   } = useUrlSettings();
   const {
     selectedProviders = [],
-    languageHints = [],
     enableSpeakerDiarization,
+    operatingPoint,
   } = settings;
 
   const [enableCustomDictionary, setEnableCustomDictionary] = React.useState(false);
   const [enableSpeakerIdentification, setEnableSpeakerIdentification] = React.useState(false);
   const [enableAudioEvents, setEnableAudioEvents] = React.useState(false);
-  const [operatingPoint, setOperatingPoint] = React.useState<"standard" | "enhanced">("standard");
 
   const isRecording = recordingState === "recording";
   const isStarting = recordingState === "starting";
@@ -62,14 +56,6 @@ export const ControlPanel: React.FC = () => {
       ? [...selectedProviders, provider]
       : selectedProviders.filter((p) => p !== provider);
     setSelectedProviders(newSelectedProviders);
-  };
-
-  const handleLanguageHintChange = (value: string) => {
-    if (value === "AUTO") {
-      setLanguageHints([]);
-    } else {
-      setLanguageHints([value]);
-    }
   };
 
   const settingsItems = [
@@ -166,45 +152,6 @@ export const ControlPanel: React.FC = () => {
                 </p>
               )}
             </div>
-          </section>
-
-          {/* Language */}
-          <section className="px-4 py-5 space-y-3">
-            <SectionLabel
-              action={
-                <TooltipProvider>
-                  <ResponsiveTooltip
-                    content={
-                      <p className="max-w-xs text-xs">
-                        Most providers require a language hint. Speechmatics
-                        can auto-identify the spoken language in real-time —
-                        try Multilingual and speak in different languages.
-                      </p>
-                    }
-                  >
-                    <Info className="h-3.5 w-3.5 cursor-help text-[#5f6e6a] hover:text-[#b4c3be] transition-colors" />
-                  </ResponsiveTooltip>
-                </TooltipProvider>
-              }
-            >
-              Language
-            </SectionLabel>
-            <SearchSelect
-              value={languageHints.length > 0 ? languageHints[0] : "AUTO"}
-              onValueChange={handleLanguageHintChange}
-              disabled={isRecording}
-              options={[
-                { value: "AUTO", label: "Multilingual (auto-identify)" },
-                ...(modelInfo?.languages.map((lang) => ({
-                  value: lang.code,
-                  label: lang.name,
-                })) || []),
-              ]}
-              placeholder="Select language"
-              searchPlaceholder="Search languages..."
-              notFoundMessage="No language found."
-              className="w-full text-sm bg-[#1d201f] border-[#2e3330] text-[#e6edeb]"
-            />
           </section>
 
           {/* Operating Point */}
