@@ -93,16 +93,35 @@ def get_google_service_config():
         recognizer_id="_",
     )
 
-    credentials_fn = "./credentials-google.json"
-    os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = credentials_fn
+    _config_dir = str(Path(__file__).resolve().parent)
+    default_credentials = os.path.join(_config_dir, "credentials-google.json")
+    credentials_fn = os.environ.get("GOOGLE_CREDENTIALS_FILE", default_credentials)
 
-    with open(credentials_fn, "r") as f:
-        credentials_data = json.load(f)
-        cfg.project_id = credentials_data.get("project_id", cfg.project_id)
-        if not cfg.project_id:
-            raise ValueError(
-                "project_id not found in credentials file and not set in GoogleConfig."
-            )
+    if os.path.exists(credentials_fn):
+        with open(credentials_fn, "r") as f:
+            raw = json.load(f)
+        # Support credentials nested under an "api_credentials" wrapper key
+        creds_info = raw.get("api_credentials", raw)
+        cfg.credentials_info = creds_info
+        cfg.project_id = creds_info.get("project_id", cfg.project_id)
+    elif "GOOGLE_APPLICATION_CREDENTIALS" in os.environ:
+        creds_path = os.environ["GOOGLE_APPLICATION_CREDENTIALS"]
+        if os.path.exists(creds_path):
+            with open(creds_path, "r") as f:
+                raw = json.load(f)
+            creds_info = raw.get("api_credentials", raw)
+            cfg.credentials_info = creds_info
+            cfg.project_id = creds_info.get("project_id", cfg.project_id)
+
+    # Allow project_id to be overridden directly via env var
+    if os.environ.get("GOOGLE_PROJECT_ID"):
+        cfg.project_id = os.environ["GOOGLE_PROJECT_ID"]
+
+    if not cfg.project_id:
+        raise ValueError(
+            "Google project_id not found. Set GOOGLE_PROJECT_ID or provide a "
+            "credentials file via GOOGLE_CREDENTIALS_FILE (default: ./credentials-google.json)."
+        )
 
     if cfg.recognizer_id == "_Default":
         print(

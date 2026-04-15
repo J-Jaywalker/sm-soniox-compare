@@ -76,6 +76,7 @@ class ServiceConfig(BaseModel):
     websocket_url: str = ""
     model: str = ""
     credentials_fn: str = ""
+    credentials_info: dict = {}
     region: str = ""
     project_id: str = ""
     prompt: str = ""

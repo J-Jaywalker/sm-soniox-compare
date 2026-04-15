@@ -155,7 +155,19 @@ class GoogleProvider(BaseProvider):
 
         api_endpoint = f"{effective_region}-speech.googleapis.com"
         client_options = ClientOptions(api_endpoint=api_endpoint)
-        self.speech_client = SpeechAsyncClient(client_options=client_options)
+
+        credentials = None
+        if self.config.service.credentials_info:
+            from google.oauth2 import service_account
+            credentials = service_account.Credentials.from_service_account_info(
+                self.config.service.credentials_info,
+                scopes=["https://www.googleapis.com/auth/cloud-platform"],
+            )
+
+        self.speech_client = SpeechAsyncClient(
+            client_options=client_options,
+            credentials=credentials,
+        )
         print(
             f"GoogleProvider: Client initialized for REGIONAL endpoint: {api_endpoint}"
         )

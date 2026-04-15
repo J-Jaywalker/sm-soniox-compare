@@ -150,39 +150,47 @@ export const ControlPanel: React.FC = () => {
         onClick={() => setSecretMenuOpen((o) => !o)}
       >
         <div className="relative">
-          {/* Always rendered to hold the height */}
-          <h2 className={cn("text-sm font-semibold tracking-tight text-white", secretMenuOpen && "invisible")}>
-            Speechmatics Compare
-          </h2>
-          <p className={cn("text-[0.72rem] text-white/45 mt-0.5", secretMenuOpen && "invisible")}>
-            Real-time ASR comparison
-          </p>
-          {/* Secret menu overlaid when open */}
-          {secretMenuOpen && (
-            <div
-              className="absolute inset-0 flex items-center gap-2"
-              onClick={(e) => e.stopPropagation()}
+          {/* Title — always rendered for sizing, slides up and fades out when menu opens */}
+          <div className={cn(
+            "transition-all duration-200 ease-in-out",
+            secretMenuOpen ? "opacity-0 -translate-y-1 pointer-events-none" : "opacity-100 translate-y-0"
+          )}>
+            <h2 className="text-sm font-semibold tracking-tight text-white">
+              Speechmatics Compare
+            </h2>
+            <p className="text-[0.72rem] text-white/45 mt-0.5">
+              Real-time ASR comparison
+            </p>
+          </div>
+          {/* Secret menu — always rendered, slides in from left */}
+          <div
+            className={cn(
+              "absolute inset-0 flex items-center gap-2 transition-all duration-200 ease-in-out",
+              secretMenuOpen
+                ? "opacity-100 translate-x-0 pointer-events-auto"
+                : "opacity-0 -translate-x-2 pointer-events-none"
+            )}
+            onClick={(e) => e.stopPropagation()}
+          >
+            <button
+              onClick={() => setEnrollDialogOpen(true)}
+              className="px-3 py-1.5 rounded-[3px] border border-white/20 text-[0.75rem] font-medium text-white/80 hover:border-white/50 hover:text-white hover:bg-white/8 transition-all duration-150"
             >
-              <button
-                onClick={() => setEnrollDialogOpen(true)}
-                className="px-3 py-1.5 rounded-[3px] border border-white/20 text-[0.75rem] font-medium text-white/80 hover:border-white/50 hover:text-white hover:bg-white/8 transition-all duration-150"
-              >
-                Enroll Speaker
-              </button>
-              <button
-                onClick={() => setManageDialogOpen(true)}
-                className="px-3 py-1.5 rounded-[3px] border border-white/20 text-[0.75rem] font-medium text-white/80 hover:border-white/50 hover:text-white hover:bg-white/8 transition-all duration-150"
-              >
-                Manage
-              </button>
-              <button
-                onClick={() => setSecretMenuOpen(false)}
-                className="px-3 py-1.5 rounded-[3px] border border-white/10 text-[0.75rem] font-medium text-white/40 hover:border-white/30 hover:text-white/70 transition-all duration-150 ml-auto"
-              >
-                Back
-              </button>
-            </div>
-          )}
+              Enroll Speaker
+            </button>
+            <button
+              onClick={() => setManageDialogOpen(true)}
+              className="px-3 py-1.5 rounded-[3px] border border-white/20 text-[0.75rem] font-medium text-white/80 hover:border-white/50 hover:text-white hover:bg-white/8 transition-all duration-150"
+            >
+              Manage
+            </button>
+            <button
+              onClick={() => setSecretMenuOpen(false)}
+              className="px-3 py-1.5 rounded-[3px] border border-white/10 text-[0.75rem] font-medium text-white/40 hover:border-white/30 hover:text-white/70 transition-all duration-150 ml-auto"
+            >
+              Back
+            </button>
+          </div>
         </div>
       </div>
 
