@@ -33,11 +33,6 @@ class SpeechmaticsProvider(BaseProvider):
         for warning in warnings:
             await self.host_queue.put(warning)
 
-        if self.config.params.enable_language_identification:
-            raise ProviderError(
-                "Speechmatics only supports language identification in batch, not streaming."
-                "\n[Click here for more info](https://docs.speechmatics.com/features-other/lang-id)"
-            )
         if self.config.params.mode == "mt":
             translation = self.config.params.translation
             self._session_target_language = translation.target_language.replace(

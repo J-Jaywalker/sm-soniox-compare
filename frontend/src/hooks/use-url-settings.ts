@@ -54,7 +54,7 @@ const defaultSelectedProviders: ProviderName[] = [
   ...initialComparisonProviders.slice(0, 2),
 ];
 const defaultEnableSpeakerDiarization = true;
-const defaultEnableLanguageIdentification = true;
+const defaultEnableLanguageIdentification = false;
 const defaultEnableEndpointDetection = false;
 const defaultTranslationType: TranslationType = "one_way";
 

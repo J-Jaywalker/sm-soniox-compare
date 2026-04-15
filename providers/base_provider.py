@@ -157,44 +157,4 @@ def validate_capabilities(
                 )
             )
 
-    if config.params.enable_language_identification:
-        state = features.language_identification
-        if state.state == FeatureState.UNSUPPORTED:
-            warnings.append(
-                info_message(
-                    provider,
-                    "Language identification is not supported and has been disabled.",
-                    level="warning",
-                )
-            )
-            config.params.enable_language_identification = False
-        elif state.state == FeatureState.PARTIAL:
-            warnings.append(
-                info_message(
-                    provider,
-                    state.comment or "Language identification is partially supported.",
-                    level="info",
-                )
-            )
-
-    if config.params.enable_endpoint_detection:
-        state = features.endpoint_detection
-        if state.state == FeatureState.UNSUPPORTED:
-            warnings.append(
-                info_message(
-                    provider,
-                    "Endpoint detection is not supported and has been disabled.",
-                    level="warning",
-                )
-            )
-            config.params.enable_endpoint_detection = False
-        elif state.state == FeatureState.PARTIAL:
-            warnings.append(
-                info_message(
-                    provider,
-                    state.comment or "Endpoint detection is partially supported.",
-                    level="info",
-                )
-            )
-
     return warnings
