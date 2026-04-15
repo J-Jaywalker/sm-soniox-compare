@@ -9,8 +9,8 @@ import {
 import { Label } from "../ui/label";
 import { useComparison } from "@/contexts/comparison-context";
 import { Button } from "../ui/button";
-import { FileAudio, Upload } from "lucide-react";
-import { useState, useRef } from "react";
+import { FileAudio } from "lucide-react";
+import { useState } from "react";
 import { ResponsiveTooltip } from "../ui/responsive-tooltip";
 import { TooltipProvider } from "@radix-ui/react-tooltip";
 
@@ -53,8 +53,6 @@ export const ChooseAudioFileDialog = ({ disabled }: { disabled?: boolean }) => {
   const isRecording = recordingState === "recording";
   const isStarting = recordingState === "starting";
   const [isProcessingFile, setIsProcessingFile] = useState(false);
-  const fileInputRef = useRef<HTMLInputElement>(null);
-
   const [isFileDialogOpen, setIsFileDialogOpen] = useState(false);
 
   const handleSelectPredefinedFile = async (url: string, name: string) => {
@@ -63,30 +61,6 @@ export const ChooseAudioFileDialog = ({ disabled }: { disabled?: boolean }) => {
     setAudio(url, name);
     setIsFileDialogOpen(false);
     setIsProcessingFile(false);
-  };
-
-  const triggerFileInput = () => {
-    fileInputRef.current?.click();
-  };
-
-  const handleCustomFileChange = async (
-    event: React.ChangeEvent<HTMLInputElement>
-  ) => {
-    const file = event.target.files?.[0];
-    if (file) {
-      setIsProcessingFile(true);
-      const fileUrl = URL.createObjectURL(file);
-      clearAudio();
-      setAudio(fileUrl, file.name);
-      setIsFileDialogOpen(false);
-      setIsProcessingFile(false);
-      // TODO: Implement streaming logic or trigger it from context
-
-      // Reset file input to allow selecting the same file again
-      if (fileInputRef.current) {
-        fileInputRef.current.value = "";
-      }
-    }
   };
 
   return (
@@ -103,7 +77,7 @@ export const ChooseAudioFileDialog = ({ disabled }: { disabled?: boolean }) => {
               }
               aria-label="Select audio file"
             >
-              <Upload className="w-4 h-4" />
+              <FileAudio className="w-4 h-4" />
             </Button>
           </DialogTrigger>
         </ResponsiveTooltip>
@@ -112,7 +86,7 @@ export const ChooseAudioFileDialog = ({ disabled }: { disabled?: boolean }) => {
         <DialogHeader>
           <DialogTitle>Select Audio Source</DialogTitle>
           <DialogDescription>
-            Choose a pre-defined audio file or upload your own.
+            Choose a pre-defined audio file.
           </DialogDescription>
         </DialogHeader>
         <div className="space-y-4 w-full">
@@ -138,28 +112,6 @@ export const ChooseAudioFileDialog = ({ disabled }: { disabled?: boolean }) => {
                 </Button>
               ))}
             </div>
-          </div>
-          <div className="pt-4 space-y-2">
-            <Label className="text-sm font-medium">Upload Custom File</Label>
-            <Button
-              variant="outline"
-              className="w-full mt-1 h-10"
-              onClick={triggerFileInput}
-              disabled={isProcessingFile}
-            >
-              <Upload className="w-4 h-4 mr-2 opacity-70" />
-              Choose File
-            </Button>
-            <input
-              type="file"
-              ref={fileInputRef}
-              onChange={handleCustomFileChange}
-              className="hidden"
-              accept="audio/*"
-            />
-            <p className="text-xs text-gray-500 mt-1">
-              Max file size: 25MB. Supported formats: WAV, MP3, FLAC, etc.
-            </p>
           </div>
         </div>
       </DialogContent>
