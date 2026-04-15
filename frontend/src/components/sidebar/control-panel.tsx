@@ -128,13 +128,6 @@ export const ControlPanel: React.FC = () => {
     setAudioEventTypes(types.length > 0 ? JSON.stringify(types) : "");
   };
 
-  // Label showing which event types are active
-  const audioEventsLabel = (() => {
-    if (!enableAudioEvents) return null;
-    if (selectedAudioEventTypes.length === 0) return "all events";
-    if (selectedAudioEventTypes.length === ALL_AUDIO_EVENT_TYPES.length) return "all events";
-    return selectedAudioEventTypes.join(", ");
-  })();
 
   return (
     <div className="h-full flex flex-col bg-[#101211]">
@@ -325,11 +318,6 @@ export const ControlPanel: React.FC = () => {
                   <span className="text-[0.82rem] font-medium text-[#e6edeb]">
                     Audio Events
                   </span>
-                  {audioEventsLabel && (
-                    <span className="ml-1.5 text-[0.68rem] text-[#5f6e6a] truncate">
-                      · {audioEventsLabel}
-                    </span>
-                  )}
                 </label>
                 {enableAudioEvents && (
                   <button
