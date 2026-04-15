@@ -38,16 +38,17 @@ export const ControlPanel: React.FC = () => {
     setSelectedProviders,
     setLanguageHints,
     setEnableSpeakerDiarization,
-    setEnableLanguageIdentification,
-    setEnableEndpointDetection,
   } = useUrlSettings();
   const {
     selectedProviders = [],
     languageHints = [],
     enableSpeakerDiarization,
-    enableLanguageIdentification,
-    enableEndpointDetection,
   } = settings;
+
+  const [enableCustomDictionary, setEnableCustomDictionary] = React.useState(false);
+  const [enableSpeakerIdentification, setEnableSpeakerIdentification] = React.useState(false);
+  const [enableAudioEvents, setEnableAudioEvents] = React.useState(false);
+  const [operatingPoint, setOperatingPoint] = React.useState<"standard" | "enhanced">("standard");
 
   const isRecording = recordingState === "recording";
   const isStarting = recordingState === "starting";
@@ -79,16 +80,22 @@ export const ControlPanel: React.FC = () => {
       onChange: setEnableSpeakerDiarization,
     },
     {
-      id: "enable-lang-id",
-      label: "Language identification",
-      checked: enableLanguageIdentification,
-      onChange: setEnableLanguageIdentification,
+      id: "enable-custom-dictionary",
+      label: "Custom Dictionary",
+      checked: enableCustomDictionary,
+      onChange: setEnableCustomDictionary,
     },
     {
-      id: "enable-endpoint-detection",
-      label: "Endpoint detection",
-      checked: enableEndpointDetection,
-      onChange: setEnableEndpointDetection,
+      id: "enable-speaker-identification",
+      label: "Speaker Identification",
+      checked: enableSpeakerIdentification,
+      onChange: setEnableSpeakerIdentification,
+    },
+    {
+      id: "enable-audio-events",
+      label: "Audio Events",
+      checked: enableAudioEvents,
+      onChange: setEnableAudioEvents,
     },
   ];
 
@@ -200,6 +207,34 @@ export const ControlPanel: React.FC = () => {
             />
           </section>
 
+          {/* Operating Point */}
+          <section className="px-4 py-5 space-y-3">
+            <SectionLabel>Operating Point</SectionLabel>
+            <div
+              className={cn(
+                "flex rounded-[4px] border border-[#2e3330] overflow-hidden transition-opacity",
+                (isRecording || isStarting) && "opacity-40 pointer-events-none"
+              )}
+            >
+              {(["standard", "enhanced"] as const).map((point, i) => (
+                <React.Fragment key={point}>
+                  {i > 0 && <div className="w-px shrink-0 bg-[#2e3330]" />}
+                  <button
+                    onClick={() => setOperatingPoint(point)}
+                    className={cn(
+                      "flex-1 py-2.5 text-[0.78rem] font-medium tracking-wide capitalize transition-all duration-150",
+                      operatingPoint === point
+                        ? "bg-[#29a383]/12 text-[#29a383]"
+                        : "text-[#5f6e6a] hover:text-[#b4c3be] hover:bg-[#29a383]/4"
+                    )}
+                  >
+                    {point}
+                  </button>
+                </React.Fragment>
+              ))}
+            </div>
+          </section>
+
           {/* Settings */}
           <section className="px-4 py-5 space-y-3">
             <SectionLabel>Settings</SectionLabel>
@@ -231,7 +266,7 @@ export const ControlPanel: React.FC = () => {
               ))}
             </div>
 
-            <div className="pt-1 hidden sm:flex">
+            <div className="pt-1 hidden sm:flex w-full">
               <FeatureComparisonDialog />
             </div>
           </section>

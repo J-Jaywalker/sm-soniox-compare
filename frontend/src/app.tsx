@@ -6,6 +6,7 @@ import { ModelDataProvider } from "@/contexts/model-data-context";
 import { FeatureComparisonTable } from "@/components/feature-comparison-table";
 import { FeatureProvider, useFeatures } from "@/contexts/feature-context";
 
+
 function App() {
   return (
     <FeatureProvider>
@@ -20,7 +21,7 @@ function AppCore() {
   if (isLoading) {
     return (
       <div className="w-screen h-screen flex items-center justify-center">
-        <img src="/compare/ui/soniox.svg" alt="Soniox Logo" className="w-20" />
+        <img src="/compare/ui/speechmatics.svg" alt="Speechmatics Logo" className="w-40" />
       </div>
     );
   }
@@ -36,7 +37,7 @@ function AppCore() {
   if (!providerFeatures) {
     return (
       <div className="w-screen h-screen flex items-center justify-center">
-        <img src="/compare/ui/soniox.svg" alt="Soniox Logo" className="w-20" />
+        <img src="/compare/ui/speechmatics.svg" alt="Speechmatics Logo" className="w-40" />
         <p>No features data available.</p>
       </div>
     );

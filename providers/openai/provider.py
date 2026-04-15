@@ -298,7 +298,10 @@ class OpenaiProvider(BaseProvider):
             confidence_scores=supported,
             translation_one_way=supported,
             translation_two_way=unsupported,
-            real_time_latency_config=unsupported,
             endpoint_detection=unsupported,
             manual_finalization=unsupported,
+            real_time_latency_config=unsupported,
+            speaker_identification=unsupported,
+            turn_detection=unsupported,
+            audio_events=unsupported,
         )

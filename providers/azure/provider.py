@@ -475,10 +475,13 @@ class AzureProvider(BaseProvider):
             confidence_scores=supported,  # ADDED https://learn.microsoft.com/en-us/azure/ai-services/speech-service/get-speech-recognition-results?pivots=programming-language-csharp # noqa
             translation_one_way=supported,
             translation_two_way=unsupported,
-            real_time_latency_config=supported,  # Speech_SegmentationSilenceTimeoutMs and SpeechServiceConnection_InitialSilenceTimeoutMs, https://learn.microsoft.com/en-us/dotnet/api/microsoft.cognitiveservices.speech.propertyid?view=azure-dotnet # noqa
             # https://learn.microsoft.com/en-us/azure/ai-services/speech-service/how-to-recognize-speech?pivots=programming-language-csharp # noqa
             endpoint_detection=supported,
             manual_finalization=unsupported,
+            real_time_latency_config=supported,  # Speech_SegmentationSilenceTimeoutMs and SpeechServiceConnection_InitialSilenceTimeoutMs
+            speaker_identification=unsupported,
+            turn_detection=unsupported,
+            audio_events=unsupported,
         )
 
     def validate_provider_capabilities(self, name: str) -> list[dict[str, Any]]:

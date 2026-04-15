@@ -15,7 +15,16 @@ import {
 } from "@/lib/provider-features"; // Assuming this is the correct path
 import { snakeCaseToTitle } from "@/lib/utils";
 
-const IGNORED_FEATURES = ["confidence_scores", "timestamps"];
+const IGNORED_FEATURES = [
+  "confidence_scores",
+  "timestamps",
+  "single_multilingual_model",
+  "language_hints",
+  "language_identification",
+  "translation_two_way",
+  "endpoint_detection",
+  "real_time_latency_config",
+];
 
 // Schemas (copied from app.tsx, consider moving to a shared types file)
 const featureInfoSchema = z.object({

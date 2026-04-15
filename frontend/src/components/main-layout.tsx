@@ -13,6 +13,7 @@ import { BottomNavbar } from "./bottom-navbar";
 import { useComparison } from "@/contexts/comparison-context";
 import { useSwipe } from "@/hooks/use-swipe";
 
+
 interface MainLayoutProps {
   sidebarContent: React.ReactNode;
   mainContent: React.ReactNode;
@@ -49,7 +50,6 @@ export const MainLayout: React.FC<MainLayoutProps> = ({
 
       {/* Main content area */}
       <main className="flex-grow relative h-dvh flex flex-col">
-        {/* Conditionally render the active view */}
         <div className="w-full flex-1">
           {activeView === "main" ? mainContent : featureTableContent}
         </div>

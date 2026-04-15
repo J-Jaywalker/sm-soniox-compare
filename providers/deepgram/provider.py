@@ -247,13 +247,14 @@ class DeepgramProvider(BaseProvider):
             confidence_scores=supported,
             translation_one_way=unsupported,
             translation_two_way=unsupported,
-            # Endpointing can affect the latency, but only when it actually detects
-            # silence in audio stream. We set this to false.
-            real_time_latency_config=unsupported,
             endpoint_detection=FeatureStatus.partial(
                 comment="Endpoint detection based on pre-determined silence duration. "
                 "This does not take into account the context. Therefore it is not "
                 "the model that decides whether the endpoint has been reached.",
             ),  # https://developers.deepgram.com/docs/endpointing #partial!!!!
             manual_finalization=supported,
+            real_time_latency_config=unsupported,
+            speaker_identification=unsupported,
+            turn_detection=unsupported,
+            audio_events=unsupported,
         )

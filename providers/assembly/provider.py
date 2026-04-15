@@ -224,12 +224,15 @@ class AssemblyProvider(BaseProvider):
             confidence_scores=supported,
             translation_one_way=unsupported,
             translation_two_way=unsupported,
-            real_time_latency_config=FeatureStatus.partial(
-                comment="Use an audio chunk size of 50ms. Larger chunk sizes "
-                "are workable, but may result in latency fluctuations.",
-            ),
             # end of turn detection:
             # https://www.assemblyai.com/docs/speech-to-text/universal-streaming
             endpoint_detection=supported,
             manual_finalization=supported,
+            real_time_latency_config=FeatureStatus.partial(
+                comment="Use an audio chunk size of 50ms. Larger chunk sizes "
+                "are workable, but may result in latency fluctuations.",
+            ),
+            speaker_identification=unsupported,
+            turn_detection=unsupported,
+            audio_events=unsupported,
         )

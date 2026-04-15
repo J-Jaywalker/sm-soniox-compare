@@ -39,9 +39,12 @@ class SupportedFeatures(BaseModel):
     confidence_scores: FeatureStatus
     translation_one_way: FeatureStatus
     translation_two_way: FeatureStatus
-    real_time_latency_config: FeatureStatus
     endpoint_detection: FeatureStatus
     manual_finalization: FeatureStatus
+    real_time_latency_config: FeatureStatus
+    speaker_identification: FeatureStatus
+    turn_detection: FeatureStatus
+    audio_events: FeatureStatus
 
 
 class ProviderData(BaseModel):

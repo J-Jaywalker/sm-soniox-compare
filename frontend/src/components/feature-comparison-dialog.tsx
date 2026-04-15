@@ -14,8 +14,8 @@ export const FeatureComparisonDialog = () => {
   return (
     <Dialog>
       <DialogTrigger asChild>
-        <Button variant="link" className="text-soniox p-0">
-          See all features
+        <Button variant="default" className="w-full bg-soniox text-sm font-medium">
+          Compare all features
         </Button>
       </DialogTrigger>
       <DialogContent

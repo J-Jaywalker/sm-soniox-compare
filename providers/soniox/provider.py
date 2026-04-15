@@ -195,7 +195,10 @@ class SonioxProvider(BaseProvider):
             confidence_scores=supported,
             translation_one_way=supported,
             translation_two_way=supported,
-            real_time_latency_config=supported,
             endpoint_detection=supported,
             manual_finalization=supported,
+            real_time_latency_config=supported,
+            speaker_identification=unsupported,
+            turn_detection=unsupported,
+            audio_events=unsupported,
         )

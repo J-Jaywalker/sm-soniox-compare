@@ -102,7 +102,7 @@ class SpeechmaticsProvider(BaseProvider):
         transcription = {
             "language": language,
             "operating_point": "enhanced",
-            "max_delay": 2.0,
+            "max_delay": 0.7,
             "enable_partials": True,
         }
         if self.config.params.enable_speaker_diarization:
@@ -328,7 +328,10 @@ class SpeechmaticsProvider(BaseProvider):
             confidence_scores=supported,  # https://docs.speechmatics.com/features/entities#example-transcription-output
             translation_one_way=supported,  # https://docs.speechmatics.com/features-other/translation
             translation_two_way=unsupported,
-            real_time_latency_config=supported,  # https://docs.speechmatics.com/features/realtime-latency
             endpoint_detection=unsupported,  # True previously, but could not find this feature.
-            manual_finalization=unsupported,
+            manual_finalization=supported,
+            real_time_latency_config=supported,  # https://docs.speechmatics.com/features/realtime-latency
+            speaker_identification=unsupported,
+            turn_detection=unsupported,
+            audio_events=unsupported,
         )
