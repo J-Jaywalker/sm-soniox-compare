@@ -8,7 +8,7 @@ import {
 
 import {
   ALL_PROVIDERS_LIST,
-  SONIOX_PROVIDER,
+  PRIMARY_PROVIDER,
   type ProviderName,
 } from "@/lib/provider-features";
 import { useMemo } from "react";
@@ -43,7 +43,7 @@ const defaultTranslationLanguageA = "en";
 const defaultTranslationLanguageB = "es";
 
 const initialComparisonProviders = ALL_PROVIDERS_LIST.filter(
-  (p) => p !== SONIOX_PROVIDER
+  (p) => p !== PRIMARY_PROVIDER
 );
 const defaultSelectedProviders: ProviderName[] = [
   ...initialComparisonProviders.slice(0, 2),
@@ -152,7 +152,7 @@ export function useUrlSettings() {
       }
     }
 
-    params.append("providers", "soniox");
+    params.append("providers", PRIMARY_PROVIDER);
     if (settings.selectedProviders && settings.selectedProviders.length > 0) {
       settings.selectedProviders.forEach((p) => params.append("providers", p));
     }

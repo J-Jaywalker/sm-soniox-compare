@@ -25,17 +25,17 @@ export const ActionPanel = () => {
   const hasAudioFile = !!selectedAudioFileName;
 
   return (
-    <div className="w-full flex flex-col gap-2 p-4 border-t border-gray-200">
+    <div className="w-full flex flex-col gap-2 p-4 border-t border-[#1e201f] bg-[#0d1110]">
       <div className="flex gap-2">
         <AudioWaveButton
           onClick={
             isRecording
               ? stopRecording
               : hasAudioFile && audioReady
-              ? startRecording // This will now play the audio file via the context logic
+              ? startRecording
               : !hasAudioFile
-              ? startRecording // This will start mic recording
-              : () => {} // Do nothing if file selected but not ready
+              ? startRecording
+              : () => {}
           }
           variant={isRecording ? "destructive" : "default"}
           className={`flex-1 ${isRecording ? "" : "bg-soniox"}`}
@@ -48,43 +48,44 @@ export const ActionPanel = () => {
         >
           {isRecording ? (
             <div className="flex flex-row items-center gap-x-2">
-              <StopCircle className="w-5 h-5" />
-              <span>
-                {isConnecting
-                  ? "Connecting..."
-                  : isStarting
-                  ? "Starting..."
-                  : "Stop"}
+              <StopCircle className="w-4 h-4" />
+              <span className="text-sm font-medium">
+                {isConnecting ? "Connecting..." : isStarting ? "Starting..." : "Stop"}
               </span>
             </div>
           ) : hasAudioFile ? (
             <div className="flex flex-row items-center gap-x-2">
-              <PlayCircle className="w-5 h-5" />
-              <span>{audioReady ? "Play audio file" : "Loading audio..."}</span>
+              <PlayCircle className="w-4 h-4" />
+              <span className="text-sm font-medium">
+                {audioReady ? "Play file" : "Loading..."}
+              </span>
             </div>
           ) : (
             <div className="flex flex-row items-center gap-x-2">
-              <Mic className="w-5 h-5" />
-              <span>Start talking</span>
+              <Mic className="w-4 h-4" />
+              <span className="text-sm font-medium">Start talking</span>
             </div>
           )}
         </AudioWaveButton>
         <ChooseAudioFileDialog disabled={hasAudioFile} />
       </div>
       {hasAudioFile && (
-        <div className="flex items-center justify-between text-xs">
-          <span className="truncate" title={selectedAudioFileName}>
+        <div className="flex items-center justify-between gap-2">
+          <span
+            className="truncate text-[0.72rem] text-[#5f6e6a] font-mono"
+            title={selectedAudioFileName}
+          >
             {selectedAudioFileName}
           </span>
           <Button
             variant="ghost"
             size="icon"
             onClick={clearAudio}
-            className="h-6 w-6 hover:text-soniox"
+            className="h-5 w-5 shrink-0 text-[#5f6e6a] hover:text-[#e6edeb] hover:bg-transparent"
             aria-label="Clear selected audio file"
             disabled={isRecording || isStarting || isStopping || isConnecting}
           >
-            <XIcon className="w-4 h-4" />
+            <XIcon className="w-3.5 h-3.5" />
           </Button>
         </div>
       )}
@@ -216,7 +217,7 @@ const AudioFileControls = () => {
     !audioRef.current.paused;
 
   return (
-    <div className="flex items-center gap-2 p-2 bg-black/10 rounded-md">
+    <div className="flex items-center gap-2 px-2 py-1.5 bg-[#1d201f] border border-[#2e3330] rounded-[4px]">
       <Button
         variant="ghost"
         size="icon"
@@ -228,20 +229,20 @@ const AudioFileControls = () => {
           recordingState === "stopping" ||
           recordingState === "connecting"
         }
-        className="h-8 w-8"
+        className="h-7 w-7 text-[#b4c3be] hover:text-[#e6edeb] hover:bg-transparent shrink-0"
         aria-label={displayAsPlaying ? "Pause audio file" : "Play audio file"}
       >
         {displayAsPlaying ? (
-          <Pause className="w-5 h-5" />
+          <Pause className="w-4 h-4" />
         ) : (
-          <Play className="w-5 h-5" />
+          <Play className="w-4 h-4" />
         )}
       </Button>
       <Slider
         value={[currentTime]}
         max={duration}
         step={1}
-        className="flex-1 h-2 data-[disabled]:opacity-50"
+        className="flex-1 h-1 data-[disabled]:opacity-30"
         onValueChange={handleSeek}
         disabled={
           !audioReady ||
@@ -252,11 +253,9 @@ const AudioFileControls = () => {
         }
         aria-label="Audio seek bar"
       />
-      <div className="text-xs w-[70px] text-right mr-2">
-        <span>{formatTime(currentTime)}</span> /{" "}
-        <span>{formatTime(duration)}</span>
+      <div className="text-[0.68rem] font-mono text-[#5f6e6a] shrink-0 tabular-nums">
+        {formatTime(currentTime)}<span className="opacity-50"> / </span>{formatTime(duration)}
       </div>
-      {/* TODO: Add volume control later if needed */}
     </div>
   );
 };

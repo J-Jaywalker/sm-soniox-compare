@@ -2,7 +2,7 @@ import React from "react";
 import { Panel } from "@/components/panel";
 import { useUrlSettings } from "@/hooks/use-url-settings";
 import { useComparison, type InfoMessage } from "@/contexts/comparison-context";
-import { SONIOX_PROVIDER, type ProviderName } from "@/lib/provider-features";
+import { PRIMARY_PROVIDER, type ProviderName } from "@/lib/provider-features";
 import { cn } from "@/lib/utils";
 import { AlertTriangle, Info, XCircle } from "lucide-react";
 import { useFeatures } from "@/contexts/feature-context";
@@ -30,8 +30,8 @@ export const ProviderGrid: React.FC = () => {
   // Combine Soniox with other selected providers for rendering
   // Ensure Soniox is always first and no duplicates if it somehow gets into selectedProviders
   const providersToDisplay: ProviderName[] = [
-    SONIOX_PROVIDER,
-    ...selectedProviders.filter((p) => p !== SONIOX_PROVIDER),
+    PRIMARY_PROVIDER,
+    ...selectedProviders.filter((p) => p !== PRIMARY_PROVIDER),
   ];
 
   const getGridColsClass = (count: number): string => {
@@ -118,7 +118,7 @@ export const ProviderGrid: React.FC = () => {
   return (
     <div
       className={cn(
-        "grid gap-px bg-gray-200 dark:bg-gray-700 h-full overflow-y-auto",
+        "grid gap-px bg-[#2e3330] h-full overflow-y-auto",
         gridColsClass
       )}
     >
@@ -139,7 +139,7 @@ export const ProviderGrid: React.FC = () => {
               title={panelTitle}
               subtitle={providerFeatures?.[providerName]?.model}
               titleTooltip={getProviderFeaturesTextTable(providerName)}
-              className={providerName === SONIOX_PROVIDER ? "text-soniox" : ""}
+              className={providerName === PRIMARY_PROVIDER ? "text-soniox" : ""}
               // trailingElement={renderWarningTooltip(providerName)} // Removed for now
             >
               <div className="absolute flex flex-col inset-0">
@@ -181,13 +181,13 @@ const InfoMessages = ({ infoMessages }: InfoMessagesProps) => {
   }
 
   return (
-    <div className="border-t shrink-0 z-10 border-gray-100 dark:border-gray-700">
+    <div className="border-t shrink-0 z-10 border-[#2e3330]">
       <Accordion type="multiple" className="w-full">
         {infoMessages.map((info, index) => (
           <AccordionItem
             value={`item-${index}`}
             key={index}
-            className="border-b-0 hover:bg-black/5 transition-colors"
+            className="border-b-0 hover:bg-[#29a383]/5 transition-colors"
           >
             <AccordionTrigger className="px-2 py-1.5 text-xs truncate hover:no-underline cursor-pointer">
               <div className="flex items-center gap-2 truncate">
@@ -198,12 +198,12 @@ const InfoMessages = ({ infoMessages }: InfoMessagesProps) => {
                   <XCircle className="h-4 w-4 text-red-500 shrink-0" />
                 )}
                 {info.level === "info" && (
-                  <Info className="h-4 w-4 text-blue-500 shrink-0" />
+                  <Info className="h-4 w-4 text-[#29a383] shrink-0" />
                 )}
-                <span className="truncate text-[10px]">{info.message}</span>
+                <span className="truncate text-[10px] text-[#b4c3be]">{info.message}</span>
               </div>
             </AccordionTrigger>
-            <AccordionContent className="p-2 mb-1 mx-2 text-[10px] bg-black/5 dark:bg-white/5 rounded-md">
+            <AccordionContent className="p-2 mb-1 mx-2 text-[10px] bg-[#1d201f] rounded-[4px]">
               <MarkdownRenderer>{info.message}</MarkdownRenderer>
             </AccordionContent>
           </AccordionItem>

@@ -56,7 +56,7 @@ export const BottomNavbar: React.FC<BottomNavbarProps> = ({
   ];
 
   return (
-    <nav className="sticky bottom-0 left-0 right-0 bg-white dark:bg-gray-800 border-t border-gray-200 dark:border-gray-700 md:hidden z-50">
+    <nav className="sticky bottom-0 left-0 right-0 bg-[#0d1110] border-t border-[#2e3330] md:hidden z-50">
       <div className="flex justify-around items-center h-16">
         {navItems.map((item) => (
           <button
@@ -65,10 +65,10 @@ export const BottomNavbar: React.FC<BottomNavbarProps> = ({
             className={cn(
               "flex flex-col items-center justify-center w-full h-full gap-1 transition-colors",
               item.isRecording
-                ? "text-red-500 hover:text-red-500/80"
+                ? "text-red-400 hover:text-red-300"
                 : item.active
                 ? "text-soniox"
-                : "text-gray-500 dark:text-gray-400 hover:text-soniox/80"
+                : "text-[#5f6e6a] hover:text-[#b4c3be]"
             )}
           >
             <item.icon className="w-6 h-6" />

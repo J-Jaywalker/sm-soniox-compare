@@ -151,9 +151,9 @@ export const TranscriptRenderer: React.FC<TranscriptRendererProps> = ({
     // } else if (error) {
     //   content = <ErrorMessage error={error} />;
   } else if (statusMessage) {
-    content = <p className="text-gray-500 italic">{statusMessage}</p>;
+    content = <p className="text-[#5f6e6a] italic text-sm">{statusMessage}</p>;
   } else if (finalParts.length === 0 && nonFinalParts.length === 0 && !error) {
-    content = <p className="text-gray-400 italic">No output yet...</p>;
+    content = <p className="text-[#37403e] italic text-sm">No output yet...</p>;
   } else {
     const finalRender = renderParts(
       finalParts,
@@ -193,10 +193,8 @@ const MAX_ERROR_LENGTH = 150;
 const ErrorMessage = ({ error }: { error: string }) => {
   if (error.length <= MAX_ERROR_LENGTH) {
     return (
-      <div className="text-soniox bg-blue-50 p-2 md:p-4 absolute left-1/2 top-1/2 -translate-y-1/2 -translate-x-1/2 text-center text-sm rounded-2xl max-w-[90%]">
-        <div className="brightness-90">
-          <MarkdownRenderer>{error}</MarkdownRenderer>
-        </div>
+      <div className="text-red-400 bg-red-950/30 border border-red-900/40 p-3 md:p-4 absolute left-1/2 top-1/2 -translate-y-1/2 -translate-x-1/2 text-center text-sm rounded-[4px] max-w-[90%]">
+        <MarkdownRenderer>{error}</MarkdownRenderer>
       </div>
     );
   }
@@ -205,22 +203,20 @@ const ErrorMessage = ({ error }: { error: string }) => {
 
   return (
     <Dialog>
-      <div className="text-soniox bg-blue-50 p-4 absolute left-1/2 top-1/2 -translate-y-1/2 -translate-x-1/2 text-center text-sm rounded-2xl max-w-[90%] space-y-2">
-        <div className="brightness-90">
-          <MarkdownRenderer>{truncatedError}</MarkdownRenderer>
-        </div>
+      <div className="text-red-400 bg-red-950/30 border border-red-900/40 p-3 md:p-4 absolute left-1/2 top-1/2 -translate-y-1/2 -translate-x-1/2 text-center text-sm rounded-[4px] max-w-[90%] space-y-2">
+        <MarkdownRenderer>{truncatedError}</MarkdownRenderer>
         <DialogTrigger asChild>
-          <Button size="sm" variant="link" className="text-soniox p-0 h-auto">
+          <Button size="sm" variant="link" className="text-[#b4c3be] p-0 h-auto">
             View Full Error
           </Button>
         </DialogTrigger>
       </div>
-      <DialogContent className="max-w-[90vw] md:max-w-3xl max-h-[80vh]">
+      <DialogContent className="max-w-[90vw] md:max-w-3xl max-h-[80vh] bg-[#1d201f] border-[#2e3330]">
         <DialogHeader>
-          <DialogTitle>Error Details</DialogTitle>
+          <DialogTitle className="text-[#e6edeb]">Error Details</DialogTitle>
         </DialogHeader>
         <div className="overflow-y-auto">
-          <pre className="text-sm text-left bg-gray-100 dark:bg-gray-900 p-4 rounded-md whitespace-pre-wrap break-words">
+          <pre className="text-sm text-left bg-[#101211] text-[#b4c3be] p-4 rounded-[4px] whitespace-pre-wrap break-words font-mono">
             <code>{error}</code>
           </pre>
         </div>
@@ -281,8 +277,8 @@ const WordToken = memo(
         >
           <span
             className={cn(
-              "px-2 py-1 text-gray-700 rounded-lg text-[10px] font-semibold tracking-wider",
-              isFinalStyling ? "opacity-50" : "opacity-60"
+              "px-2 py-0.5 text-[#37403e] rounded text-[10px] font-mono tracking-wider border border-[#2e3330]",
+              isFinalStyling ? "opacity-60" : "opacity-40"
             )}
           >
             {`<end>`}
@@ -301,14 +297,14 @@ const WordToken = memo(
       titleParts.push(`Confidence: ${part.confidence.toFixed(2)}`);
 
     const textClassName = isFinalStyling
-      ? "text-gray-800 dark:text-gray-200"
-      : "text-gray-500 dark:text-gray-400 italic";
+      ? "text-[#e6edeb]"
+      : "text-[#5f6e6a] italic";
 
     const languageTag = displayedLanguage ? (
       <>
         {onNewLine && <br />}
         {addSpacing && <div className="h-3" />}
-        <span className="px-2 mr-0.5 py-0.5 bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-400 rounded-full text-xs font-medium">
+        <span className="px-2 mr-0.5 py-0.5 bg-[#1d201f] border border-[#2e3330] text-[#b4c3be] rounded text-[0.68rem] font-medium">
           {new Intl.DisplayNames(["en"], { type: "language" }).of(
             displayedLanguage
           ) || displayedLanguage}
@@ -334,8 +330,8 @@ const WordToken = memo(
             className={cn(
               textClassName,
               part.translation_status === "translation" &&
-                "text-gray-400 dark:text-gray-500 text-sm italic",
-              "hover:text-soniox rounded-lg"
+                "text-[#5f6e6a] text-sm italic",
+              "hover:text-soniox rounded"
             )}
           >
             {textToRender}

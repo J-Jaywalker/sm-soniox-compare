@@ -41,7 +41,7 @@ export const MainLayout: React.FC<MainLayoutProps> = ({
     <div
       {...swipeHandlers}
       style={{ touchAction: "pan-y" }}
-      className="w-full h-dvh flex flex-row font-sans antialiased bg-white dark:bg-gray-950 text-gray-800 dark:text-gray-200 overflow-hidden"
+      className="w-full h-dvh flex flex-row font-sans antialiased bg-[#101211] text-[#e6edeb] overflow-hidden"
     >
       <Sidebar isSheetOpen={isSidebarOpen} setIsSheetOpen={setIsSidebarOpen}>
         {sidebarContent}
@@ -116,8 +116,8 @@ const Sidebar: React.FC<SidebarProps> = ({
       {/* Static Sidebar for larger screens */}
       <aside
         className={cn(
-          "sticky shrink-0 top-0 h-screen w-72 flex-col border-r border-gray-200 bg-gray-50 dark:border-gray-800 dark:bg-gray-900",
-          "hidden lg:flex" // Always apply these for the static version
+          "sticky shrink-0 top-0 h-screen w-72 flex-col border-r border-[#2e3330] bg-[#101211]",
+          "hidden lg:flex"
         )}
       >
         {children}

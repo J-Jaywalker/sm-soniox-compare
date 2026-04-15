@@ -1,43 +1,49 @@
 import React from "react";
-import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
-import { Label } from "@/components/ui/label";
 import { TooltipProvider } from "@/components/ui/tooltip";
-import { Info, Languages, NotebookPen } from "lucide-react";
+import { Info } from "lucide-react";
 import { useUrlSettings } from "@/hooks/use-url-settings";
 import { useComparison } from "@/contexts/comparison-context";
 import { ActionPanel } from "./action-panel";
-import { TranslationSettings } from "./translation-settings";
 import { useModelData } from "@/contexts/model-data-context";
 import { SearchSelect } from "@/components/ui/search-select";
-import { FaDiscord, FaGithub } from "react-icons/fa";
 import { useFeatures } from "@/contexts/feature-context";
 import type { ProviderName } from "@/lib/provider-features";
 import { ResponsiveTooltip } from "../ui/responsive-tooltip";
-import { ToggleGroup, ToggleGroupItem } from "../ui/toggle-group";
 import { FeatureComparisonDialog } from "../feature-comparison-dialog";
+import { cn } from "@/lib/utils";
+
+const SectionLabel = ({
+  children,
+  action,
+}: {
+  children: React.ReactNode;
+  action?: React.ReactNode;
+}) => (
+  <div className="flex items-center gap-2">
+    <p className="text-[0.68rem] font-bold uppercase tracking-[0.08em] text-[#5f6e6a] border-l-2 border-[#29a383] pl-2 leading-none">
+      {children}
+    </p>
+    {action}
+  </div>
+);
 
 export const ControlPanel: React.FC = () => {
   const { recordingState } = useComparison();
   const { providerFeatures, availableComparisonProviders } = useFeatures();
-
   const { modelInfo } = useModelData();
 
   const {
     settings,
     setSelectedProviders,
-    setMode,
     setLanguageHints,
-    // setContext,
     setEnableSpeakerDiarization,
     setEnableLanguageIdentification,
     setEnableEndpointDetection,
   } = useUrlSettings();
   const {
     selectedProviders = [],
-    mode,
     languageHints = [],
-    // context = "",
     enableSpeakerDiarization,
     enableLanguageIdentification,
     enableEndpointDetection,
@@ -65,248 +71,170 @@ export const ControlPanel: React.FC = () => {
     }
   };
 
+  const settingsItems = [
+    {
+      id: "enable-diarization",
+      label: "Speaker diarization",
+      checked: enableSpeakerDiarization,
+      onChange: setEnableSpeakerDiarization,
+    },
+    {
+      id: "enable-lang-id",
+      label: "Language identification",
+      checked: enableLanguageIdentification,
+      onChange: setEnableLanguageIdentification,
+    },
+    {
+      id: "enable-endpoint-detection",
+      label: "Endpoint detection",
+      checked: enableEndpointDetection,
+      onChange: setEnableEndpointDetection,
+    },
+  ];
+
   return (
-    <div className="h-full flex flex-col bg-zinc-50">
-      <div className="relative flex-1">
-        <div className="flex absolute z-10 top-0 inset-x-0 right-4 justify-between items-center p-4">
-          <div className="absolute inset-x-0 top-0 flex flex-col pointer-events-none w-full">
-            <div className="bg-zinc-50 h-12 -z-10" />
-            <div className="h-8 bg-gradient-to-b from-zinc-50 to-transparent -z-10" />
-          </div>
-          <h2 className="text-xl font-semibold text-gray-700 dark:text-gray-100">
-            Soniox Compare
-          </h2>
-          <TooltipProvider>
-            <div className="flex -mr-4 text-gray-400 items-center gap-x-1">
-              {/* A github button */}
-              <ResponsiveTooltip content={<p>Join Discord</p>}>
-                <a
-                  href="https://discord.com/invite/rWfnk9uM5j"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
-                  <Button variant="ghost" size="icon" className="">
-                    <FaDiscord className="size-5" />
-                  </Button>
-                </a>
-              </ResponsiveTooltip>
-              <ResponsiveTooltip content={<p>View on GitHub</p>}>
-                <a
-                  href="https://github.com/soniox/soniox-compare"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
-                  <Button variant="ghost" size="icon">
-                    <FaGithub className="size-5" />
-                  </Button>
-                </a>
-              </ResponsiveTooltip>
-            </div>
-          </TooltipProvider>
-        </div>
-        <div className="absolute inset-0 overflow-y-auto flex flex-col space-y-4 p-4 pt-12 pb-0">
-          <div className="w-full space-y-4 pt-6">
-            <Label className="text-sm font-semibold text-gray-700 dark:text-gray-300 block mb-2">
-              1. Select speech providers
-            </Label>
-            <div className="space-y-2 max-h-60 overflow-y-auto p-2 border rounded-md dark:border-gray-700 bg-white dark:bg-zinc-800">
-              {availableComparisonProviders.map((provider) => (
-                <div key={provider} className="flex items-center space-x-2">
-                  <Checkbox
-                    id={`provider-checkbox-${provider}`}
-                    checked={selectedProviders.includes(provider)}
-                    onCheckedChange={(checkedState) =>
-                      handleProviderSelectionChange(provider, checkedState)
-                    }
-                    disabled={isRecording || !providerFeatures}
-                    className="data-[state=checked]:bg-soniox data-[state=checked]:text-white"
-                  />
-                  <Label
+    <div className="h-full flex flex-col bg-[#101211]">
+      {/* Brand header */}
+      <div className="shrink-0 px-4 py-3.5 bg-[#0D3C48]">
+        <h2 className="text-sm font-semibold tracking-tight text-white">
+          Speechmatics Compare
+        </h2>
+        <p className="text-[0.72rem] text-white/45 mt-0.5">
+          Real-time ASR comparison
+        </p>
+      </div>
+
+      {/* Scrollable content */}
+      <div className="flex-1 overflow-y-auto">
+        <div className="flex flex-col divide-y divide-[#1e201f]">
+          {/* Providers */}
+          <section className="px-4 py-5 space-y-3">
+            <SectionLabel>Providers</SectionLabel>
+            <div className="space-y-1.5">
+              {availableComparisonProviders.map((provider) => {
+                const isSelected = selectedProviders.includes(provider);
+                const isDisabled = isRecording || !providerFeatures;
+                return (
+                  <label
+                    key={provider}
                     htmlFor={`provider-checkbox-${provider}`}
-                    className="text-sm font-normal capitalize cursor-pointer truncate"
+                    className={cn(
+                      "flex items-center gap-3 px-3 py-2.5 border rounded-[4px] cursor-pointer transition-all duration-150 select-none",
+                      isSelected
+                        ? "border-[#29a383]/40 bg-[#29a383]/8"
+                        : "border-[#2e3330] hover:border-[#29a383]/25 hover:bg-[#29a383]/4",
+                      isDisabled && "opacity-40 cursor-not-allowed pointer-events-none"
+                    )}
                   >
-                    {providerFeatures?.[provider]?.name ?? provider}
-                    <span className="text-xs text-gray-400 dark:text-gray-500 lowercase truncate">
-                      {providerFeatures?.[provider]?.model}
-                    </span>
-                  </Label>
-                </div>
-              ))}
-              {availableComparisonProviders.length === 0 &&
-                providerFeatures && (
-                  <p className="text-xs text-gray-400 dark:text-gray-500 p-2">
-                    No other providers available for comparison.
-                  </p>
-                )}
+                    <Checkbox
+                      id={`provider-checkbox-${provider}`}
+                      checked={isSelected}
+                      onCheckedChange={(checkedState) =>
+                        handleProviderSelectionChange(provider, checkedState)
+                      }
+                      disabled={isDisabled}
+                      className="border-[#37403e] data-[state=checked]:bg-[#29a383] data-[state=checked]:border-[#29a383] shrink-0"
+                    />
+                    <div className="flex flex-col min-w-0">
+                      <span className="text-[0.82rem] font-medium text-[#e6edeb] capitalize truncate leading-snug">
+                        {providerFeatures?.[provider]?.name ?? provider}
+                      </span>
+                      {providerFeatures?.[provider]?.model && (
+                        <span className="text-[0.72rem] text-[#5f6e6a] truncate">
+                          {providerFeatures[provider].model}
+                        </span>
+                      )}
+                    </div>
+                  </label>
+                );
+              })}
+              {availableComparisonProviders.length === 0 && providerFeatures && (
+                <p className="text-xs text-[#5f6e6a] px-1 py-2">
+                  No other providers available.
+                </p>
+              )}
               {!providerFeatures && (
-                <p className="text-xs text-gray-400 dark:text-gray-500 p-2">
-                  Loading provider list...
+                <p className="text-xs text-[#5f6e6a] px-1 py-2 animate-pulse">
+                  Loading providers...
                 </p>
               )}
             </div>
-          </div>
+          </section>
 
-          <div className="w-full space-y-4 dark:border-gray-700">
-            <div>
-              <Label
-                htmlFor="op-mode"
-                className="text-sm font-semibold text-gray-700 dark:text-gray-300 block mb-1"
-              >
-                2. Select mode
-              </Label>
-              <ToggleGroup
-                id="op-mode"
-                type="single"
-                value={mode}
-                onValueChange={(v) => {
-                  if (v) setMode(v as "stt" | "mt");
-                }}
-                className="w-full grid grid-cols-2 border border-input rounded-md"
-                disabled={isRecording}
-              >
-                <ToggleGroupItem
-                  value="stt"
-                  aria-label="Speech-to-text"
-                  className="data-[state=on]:text-soniox text-gray-700 dark:text-gray-300 hover:bg-soniox/10 dark:hover:bg-soniox/20"
-                >
-                  <NotebookPen className="h-4 w-4 opacity-70" />
-                  Transcribe
-                </ToggleGroupItem>
-                <ToggleGroupItem
-                  value="mt"
-                  aria-label="Speech Translation"
-                  className="data-[state=on]:text-soniox text-gray-700 dark:text-gray-300 hover:bg-soniox/10 dark:hover:bg-soniox/20"
-                >
-                  <Languages className="h-4 w-4 opacity-70" />
-                  Translate
-                </ToggleGroupItem>
-              </ToggleGroup>
-            </div>
-            {mode === "stt" && (
-              <div>
-                <div className="flex items-center space-x-2 mb-1">
-                  <Label
-                    htmlFor="input-lang"
-                    className="text-sm font-semibold text-gray-700 dark:text-gray-300 block"
+          {/* Language */}
+          <section className="px-4 py-5 space-y-3">
+            <SectionLabel
+              action={
+                <TooltipProvider>
+                  <ResponsiveTooltip
+                    content={
+                      <p className="max-w-xs text-xs">
+                        Most providers require a language hint. Speechmatics
+                        can auto-identify the spoken language in real-time —
+                        try Multilingual and speak in different languages.
+                      </p>
+                    }
                   >
-                    3. Select language
-                  </Label>
-                  <TooltipProvider>
-                    <ResponsiveTooltip
-                      content={
-                        <p className="max-w-xs">
-                          Most providers require an input language. Soniox can
-                          auto-identify spoken language in real-time. Try it out
-                          by selecting Multilingual option and start talking in
-                          different languages.
-                        </p>
-                      }
-                    >
-                      <Info className="h-4 w-4 cursor-help opacity-50" />
-                    </ResponsiveTooltip>
-                  </TooltipProvider>
-                </div>
-                <SearchSelect
-                  value={languageHints.length > 0 ? languageHints[0] : "AUTO"}
-                  onValueChange={handleLanguageHintChange}
-                  disabled={isRecording}
-                  options={[
-                    { value: "AUTO", label: "Multilingual (auto-identify)" },
-                    ...(modelInfo?.languages.map((lang) => ({
-                      value: lang.code,
-                      label: lang.name,
-                    })) || []),
-                  ]}
-                  placeholder="Select input language hint"
-                  searchPlaceholder="Search languages..."
-                  notFoundMessage="No language found."
-                  className="w-full text-sm bg-white dark:bg-zinc-800"
-                />
-              </div>
-            )}
-            {mode === "mt" && <TranslationSettings />}
-          </div>
+                    <Info className="h-3.5 w-3.5 cursor-help text-[#5f6e6a] hover:text-[#b4c3be] transition-colors" />
+                  </ResponsiveTooltip>
+                </TooltipProvider>
+              }
+            >
+              Language
+            </SectionLabel>
+            <SearchSelect
+              value={languageHints.length > 0 ? languageHints[0] : "AUTO"}
+              onValueChange={handleLanguageHintChange}
+              disabled={isRecording}
+              options={[
+                { value: "AUTO", label: "Multilingual (auto-identify)" },
+                ...(modelInfo?.languages.map((lang) => ({
+                  value: lang.code,
+                  label: lang.name,
+                })) || []),
+              ]}
+              placeholder="Select language"
+              searchPlaceholder="Search languages..."
+              notFoundMessage="No language found."
+              className="w-full text-sm bg-[#1d201f] border-[#2e3330] text-[#e6edeb]"
+            />
+          </section>
 
-          <div className="w-full space-y-4 mb-2">
-            <Label className="text-sm font-semibold text-gray-700 dark:text-gray-300 block mb-2">
-              4. Settings (optional)
-            </Label>
-            <div className="space-y-2">
-              <div className="flex items-center space-x-2">
-                <Checkbox
-                  id="enable-diarization"
-                  checked={enableSpeakerDiarization}
-                  onCheckedChange={(checked) =>
-                    setEnableSpeakerDiarization(Boolean(checked))
-                  }
-                  disabled={isRecording || isStarting}
-                  className="data-[state=checked]:bg-soniox data-[state=checked]:text-white"
-                />
-                <Label
-                  htmlFor="enable-diarization"
-                  className="text-sm font-normal cursor-pointer"
+          {/* Settings */}
+          <section className="px-4 py-5 space-y-3">
+            <SectionLabel>Settings</SectionLabel>
+            <div className="space-y-1.5">
+              {settingsItems.map(({ id, label, checked, onChange }) => (
+                <label
+                  key={id}
+                  htmlFor={id}
+                  className={cn(
+                    "flex items-center gap-3 px-3 py-2.5 border rounded-[4px] cursor-pointer transition-all duration-150 select-none",
+                    checked
+                      ? "border-[#29a383]/40 bg-[#29a383]/8"
+                      : "border-[#2e3330] hover:border-[#29a383]/25 hover:bg-[#29a383]/4",
+                    (isRecording || isStarting) &&
+                      "opacity-40 cursor-not-allowed pointer-events-none"
+                  )}
                 >
-                  Enable speaker diarization
-                </Label>
-              </div>
-              <div className="flex items-center space-x-2">
-                <Checkbox
-                  id="enable-lang-id"
-                  checked={enableLanguageIdentification}
-                  onCheckedChange={(checked) =>
-                    setEnableLanguageIdentification(Boolean(checked))
-                  }
-                  disabled={isRecording || isStarting}
-                  className="data-[state=checked]:bg-soniox data-[state=checked]:text-white"
-                />
-                <Label
-                  htmlFor="enable-lang-id"
-                  className="text-sm font-normal cursor-pointer"
-                >
-                  Enable language identification
-                </Label>
-              </div>
-              <div className="flex items-center space-x-2">
-                <Checkbox
-                  id="enable-endpoint-detection"
-                  checked={enableEndpointDetection}
-                  onCheckedChange={(checked) =>
-                    setEnableEndpointDetection(Boolean(checked))
-                  }
-                  disabled={isRecording || isStarting}
-                  className="data-[state=checked]:bg-soniox data-[state=checked]:text-white"
-                />
-                <Label
-                  htmlFor="enable-endpoint-detection"
-                  className="text-sm font-normal cursor-pointer"
-                >
-                  Enable endpoint detection
-                </Label>
-              </div>
-              {/* <div className="mt-4">
-                <Label
-                  htmlFor="context"
-                  className="text-sm font-medium text-gray-700 dark:text-gray-300 block mb-1"
-                >
-                  Context (Optional)
-                </Label>
-                <Textarea
-                  id="context"
-                  value={context}
-                  onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) =>
-                    setContext(e.target.value)
-                  }
-                  placeholder="Provide relevant context, names, or keywords to improve transcription accuracy..."
-                  className="w-full text-sm bg-white dark:bg-zinc-800"
-                  rows={3}
-                  disabled={isRecording || isStarting}
-                />
-              </div> */}
+                  <Checkbox
+                    id={id}
+                    checked={checked}
+                    onCheckedChange={(c) => onChange(Boolean(c))}
+                    disabled={isRecording || isStarting}
+                    className="border-[#37403e] data-[state=checked]:bg-[#29a383] data-[state=checked]:border-[#29a383] shrink-0"
+                  />
+                  <span className="text-[0.82rem] font-medium text-[#e6edeb]">
+                    {label}
+                  </span>
+                </label>
+              ))}
             </div>
-            <div className="text-center hidden sm:block">
+
+            <div className="pt-1 hidden sm:flex">
               <FeatureComparisonDialog />
             </div>
-          </div>
+          </section>
         </div>
       </div>
 

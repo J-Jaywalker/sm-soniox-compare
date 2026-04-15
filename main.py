@@ -3,32 +3,25 @@ import importlib
 import os
 from typing import Dict, List, Any
 
-import aiohttp
 from dotenv import load_dotenv
 from fastapi import FastAPI, Query, Request, WebSocket
 from fastapi.responses import HTMLResponse, PlainTextResponse, FileResponse
 from fastapi.templating import Jinja2Templates
 from fastapi.staticfiles import StaticFiles
 
-from config import get_provider_config, get_soniox_service_config
+from config import get_provider_config
 from providers.base_provider import BaseProvider
 from utils import error_message
 
-from providers.soniox.provider import SonioxProvider
 from providers.deepgram.provider import DeepgramProvider
-from providers.assembly.provider import AssemblyProvider
 from providers.google.provider import GoogleProvider
 from providers.azure.provider import AzureProvider
 from providers.speechmatics.provider import SpeechmaticsProvider
-from providers.openai.provider import OpenaiProvider
 
 from providers.config import ProviderParams, TranslationConfig, OperationMode
 
 PROVIDERS = [
-    SonioxProvider,
-    OpenaiProvider,
     DeepgramProvider,
-    AssemblyProvider,
     GoogleProvider,
     AzureProvider,
     SpeechmaticsProvider,
@@ -235,22 +228,6 @@ async def get_providers():
         all_features[key_name] = provider_features
     return all_features
 
-
-@app.get("/compare/api/soniox-model", response_model=Dict[str, Any])
-async def get_soniox_model():
-    soniox_service_config = get_soniox_service_config()
-
-    async with aiohttp.ClientSession() as session:
-        async with session.get(
-            "https://api.soniox.com/v1/models",
-            headers={"Authorization": f"Bearer {soniox_service_config.api_key}"},
-        ) as resp:
-            resp.raise_for_status()
-            models = await resp.json()
-            for model in models["models"]:
-                if model["id"] == "stt-rt-preview":
-                    return model
-            raise Exception("Model not found")
 
 
 @app.get("/.well-known/health/soniox-compare", response_class=PlainTextResponse)

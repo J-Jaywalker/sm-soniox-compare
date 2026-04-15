@@ -37,7 +37,7 @@ export const AutoScrollContainer = ({
       {/* Scroll to Bottom Button */}
       {!isScrolledToBottom && (
         <button
-          className="absolute bottom-4 cursor-pointer right-4 rounded-full bg-zinc-500/30 p-2 text-white shadow-md transition hover:bg-zinc-600/80"
+          className="absolute bottom-4 cursor-pointer right-4 rounded-full bg-[#1d201f] border border-[#2e3330] p-2 text-[#b4c3be] shadow-md transition hover:bg-[#29a383]/20 hover:text-[#29a383] hover:border-[#29a383]/40"
           onClick={scrollToBottom}
         >
           <ChevronDown className="h-5 w-5" />

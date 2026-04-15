@@ -10,7 +10,7 @@ import React, {
 import { z } from "zod";
 import {
   ALL_PROVIDERS_LIST,
-  SONIOX_PROVIDER,
+  PRIMARY_PROVIDER,
   type ProviderName,
 } from "@/lib/provider-features"; // Assuming this is the correct path
 import { snakeCaseToTitle } from "@/lib/utils";
@@ -60,7 +60,7 @@ export const FeatureProvider: React.FC<{ children: ReactNode }> = ({
 
   const availableComparisonProviders = useMemo(() => {
     return providerFeatures
-      ? ALL_PROVIDERS_LIST.filter((p) => p !== SONIOX_PROVIDER)
+      ? ALL_PROVIDERS_LIST.filter((p) => p !== PRIMARY_PROVIDER)
       : [];
   }, [providerFeatures]);
 
@@ -115,7 +115,7 @@ export const FeatureProvider: React.FC<{ children: ReactNode }> = ({
   );
 
   const getFeatureSet = useCallback(() => {
-    return Object.keys(getProviderFeatures(SONIOX_PROVIDER));
+    return Object.keys(getProviderFeatures(PRIMARY_PROVIDER));
   }, [getProviderFeatures]);
 
   const getProviderFeaturesTextTable = useCallback(
