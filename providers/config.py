@@ -88,6 +88,7 @@ class ProviderParams(BaseModel):
     language_hints: list[str] = []
     context: str = ""
     operating_point: str = "enhanced"
+    enable_partials: bool = True
     enable_speaker_diarization: bool = True
     enable_language_identification: bool = True
     enable_endpoint_detection: bool = True

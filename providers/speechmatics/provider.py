@@ -100,8 +100,10 @@ class SpeechmaticsProvider(BaseProvider):
             "language": language,
             "operating_point": self.config.params.operating_point,
             "max_delay": 0.7,
-            "enable_partials": False,
+            "enable_partials": self.config.params.enable_partials,
         }
+        if self.config.params.enable_partials:
+            transcription["max_delay_mode"] = "flexible"
         if (self.config.params.enable_speaker_diarization
                 or self.config.params.enrolled_speakers):
             transcription["diarization"] = "speaker"

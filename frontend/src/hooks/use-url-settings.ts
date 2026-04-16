@@ -24,6 +24,7 @@ export interface UrlSettings {
   mode: "stt" | "mt";
   context: string;
   operatingPoint: "standard" | "enhanced";
+  enablePartials: boolean;
   targetTranslationLanguage: string;
   sourceTranslationLanguages: string[];
   selectedProviders: ProviderName[];
@@ -71,6 +72,7 @@ const settingParsers = {
   mode: parseAsStringLiteral(modeLiterals).withDefault(defaultMode),
   context: parseAsString.withDefault(defaultContext),
   operatingPoint: parseAsStringLiteral(operatingPointLiterals).withDefault(defaultOperatingPoint),
+  enablePartials: parseAsBoolean.withDefault(true),
   targetTranslationLanguage: parseAsString.withDefault(
     defaultTargetTranslationLanguage
   ),
@@ -122,6 +124,7 @@ export function useUrlSettings() {
 
     params.set("context", settings.context || "");
     params.set("operating_point", settings.operatingPoint);
+    params.set("enable_partials", String(settings.enablePartials));
     params.set(
       "enable_speaker_diarization",
       String(settings.enableSpeakerDiarization)
@@ -203,6 +206,8 @@ export function useUrlSettings() {
     setContext: (text: string) => setSettings({ context: text }),
     setOperatingPoint: (point: "standard" | "enhanced") =>
       setSettings({ operatingPoint: point }),
+    setEnablePartials: (enabled: boolean) =>
+      setSettings({ enablePartials: enabled }),
     setTargetTranslationLanguage: (lang: string) =>
       setSettings({ targetTranslationLanguage: lang }),
     setSourceTranslationLanguages: (langs: string[]) =>

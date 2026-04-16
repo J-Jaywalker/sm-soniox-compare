@@ -87,6 +87,9 @@ async def compare_websocket(
     translation_type: str = Query(
         default="one_way", description="Type of translation (one_way/two_way)"
     ),
+    enable_partials: bool = Query(
+        default=True, description="Enable partial/interim results"
+    ),
     additional_vocab: str = Query(
         default="", description="Additional vocabulary as JSON array"
     ),
@@ -135,6 +138,7 @@ async def compare_websocket(
             language_hints=language_hints,
             context=context,
             operating_point=operating_point,
+            enable_partials=enable_partials,
             enable_speaker_diarization=enable_speaker_diarization,
             enable_language_identification=enable_language_identification,
             enable_endpoint_detection=enable_endpoint_detection,

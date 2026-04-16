@@ -469,7 +469,7 @@ class AzureProvider(BaseProvider):
             language_identification=FeatureStatus.partial(
                 comment="Azure's language detection is limited to detecting one out of a maximum of 10 inputted languages. Soniox can detect any language that is currently supported. [Click here for more info.](https://learn.microsoft.com/en-us/azure/ai-services/speech-service/language-identification?tabs=once&pivots=programming-language-python)"
             ),  # https://learn.microsoft.com/en-us/azure/ai-services/speech-service/language-identification?tabs=once&pivots=programming-language-csharp # noqa
-            speaker_diarization=partial,  # NOTE: Only for transcription, not translation https://learn.microsoft.com/en-us/azure/ai-services/speech-service/get-started-stt-diarization?tabs=linux&pivots=programming-language-csharp # noqa
+            speaker_diarization=supported,  # NOTE: Only for transcription, not translation https://learn.microsoft.com/en-us/azure/ai-services/speech-service/get-started-stt-diarization?tabs=linux&pivots=programming-language-csharp # noqa
             customization=supported,  # https://learn.microsoft.com/en-us/azure/ai-services/speech-service/improve-accuracy-phrase-list?tabs=terminal&pivots=programming-language-csharp # noqa
             timestamps=supported,  # ADDED https://learn.microsoft.com/en-us/azure/ai-services/speech-service/get-speech-recognition-results?pivots=programming-language-csharp # noqa
             confidence_scores=supported,  # ADDED https://learn.microsoft.com/en-us/azure/ai-services/speech-service/get-speech-recognition-results?pivots=programming-language-csharp # noqa

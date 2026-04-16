@@ -37,6 +37,7 @@ export const ControlPanel: React.FC = () => {
     setSelectedProviders,
     setEnableSpeakerDiarization,
     setOperatingPoint,
+    setEnablePartials,
     setEnableCustomDictionary,
     setAdditionalVocab,
     setEnableAudioEvents,
@@ -47,6 +48,7 @@ export const ControlPanel: React.FC = () => {
     selectedProviders = [],
     enableSpeakerDiarization,
     operatingPoint,
+    enablePartials,
     enableCustomDictionary,
     additionalVocab,
     enableAudioEvents,
@@ -273,6 +275,34 @@ export const ControlPanel: React.FC = () => {
                     )}
                   >
                     {point}
+                  </button>
+                </React.Fragment>
+              ))}
+            </div>
+          </section>
+
+          {/* Partials */}
+          <section className="px-4 py-5 space-y-3">
+            <SectionLabel>Partials</SectionLabel>
+            <div
+              className={cn(
+                "flex rounded-[4px] border border-[#2e3330] overflow-hidden transition-opacity",
+                (isRecording || isStarting) && "opacity-40 pointer-events-none"
+              )}
+            >
+              {([false, true] as const).map((value, i) => (
+                <React.Fragment key={String(value)}>
+                  {i > 0 && <div className="w-px shrink-0 bg-[#2e3330]" />}
+                  <button
+                    onClick={() => setEnablePartials(value)}
+                    className={cn(
+                      "flex-1 py-2.5 text-[0.78rem] font-medium tracking-wide capitalize transition-all duration-150",
+                      enablePartials === value
+                        ? "bg-[#29a383]/12 text-[#29a383]"
+                        : "text-[#5f6e6a] hover:text-[#b4c3be] hover:bg-[#29a383]/4"
+                    )}
+                  >
+                    {value ? "On" : "Off"}
                   </button>
                 </React.Fragment>
               ))}

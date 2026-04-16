@@ -73,7 +73,7 @@ class DeepgramProvider(BaseProvider):
                 ("language", language),
                 ("model", self.config.service.model),
                 ("punctuate", "true"),
-                ("interim_results", "true"),
+                ("interim_results", "true" if self.config.params.enable_partials else "false"),
                 ("encoding", "linear16"),
                 ("sample_rate", self.config.common.sample_rate),
                 ("diarize", "true" if self.config.params.enable_speaker_diarization else "false"),
