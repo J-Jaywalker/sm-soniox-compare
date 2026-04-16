@@ -206,7 +206,8 @@ class GoogleProvider(BaseProvider):
             self._streaming_config = StreamingRecognitionConfig(
                 config=recognition_config_details,
                 streaming_features=cloud_speech.StreamingRecognitionFeatures(
-                    interim_results=True, enable_voice_activity_events=True
+                    interim_results=self.config.params.enable_partials,
+                    enable_voice_activity_events=True,
                 ),
             )
 
