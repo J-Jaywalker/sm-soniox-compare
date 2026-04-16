@@ -261,6 +261,6 @@ class DeepgramProvider(BaseProvider):
             manual_finalization=supported,
             real_time_latency_config=unsupported,
             speaker_identification=unsupported,
-            turn_detection=unsupported,
+            turn_detection=supported,
             audio_events=unsupported,
         )
