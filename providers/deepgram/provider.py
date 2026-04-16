@@ -168,18 +168,17 @@ class DeepgramProvider(BaseProvider):
                         parts = []
                         speaker = None
                         for word in words:
-                            if self.config.params.enable_speaker_diarization:
-                                speaker = word.get("speaker", "UNKNOWN")
-                                if speaker != "UNKNOWN":
-                                    speaker += 1
+                            raw_speaker = word.get("speaker")
+                            if self.config.params.enable_speaker_diarization and raw_speaker is not None:
+                                speaker = raw_speaker + 1  # 0-indexed → 1-indexed for display
                             else:
                                 speaker = None
 
                             start_s = word.get("start")
-                            start_ms = int(start_s * 1000) if start_s is None else None
+                            start_ms = int(start_s * 1000) if start_s is not None else None
 
                             end_s = word.get("end")
-                            end_ms = int(end_s * 1000) if end_s is None else None
+                            end_ms = int(end_s * 1000) if end_s is not None else None
 
                             confidence = word.get("confidence")
 
