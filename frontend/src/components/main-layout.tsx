@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from "react";
-import { Menu } from "lucide-react";
+import React, { useState, useEffect, useCallback } from "react";
+import { Menu, ChevronRight, ChevronLeft } from "lucide-react";
 import { cn } from "@/lib/utils";
 import {
   Sheet,
@@ -27,6 +27,23 @@ export const MainLayout: React.FC<MainLayoutProps> = ({
 }) => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [activeView, setActiveView] = useState<"main" | "features">("main");
+  const [activePage, setActivePage] = useState<"primary" | "secondary">("primary");
+  const [nearRightEdge, setNearRightEdge] = useState(false);
+  const [nearLeftEdge, setNearLeftEdge] = useState(false);
+
+  const EDGE_THRESHOLD = 64;
+
+  const handleMouseMove = useCallback((e: React.MouseEvent<HTMLElement>) => {
+    const rect = e.currentTarget.getBoundingClientRect();
+    const relX = e.clientX - rect.left;
+    setNearRightEdge(relX >= rect.width - EDGE_THRESHOLD);
+    setNearLeftEdge(relX <= EDGE_THRESHOLD);
+  }, []);
+
+  const handleMouseLeave = useCallback(() => {
+    setNearRightEdge(false);
+    setNearLeftEdge(false);
+  }, []);
   const { recordingState, stopRecording } = useComparison();
 
   const swipeHandlers = useSwipe({
@@ -49,25 +66,60 @@ export const MainLayout: React.FC<MainLayoutProps> = ({
       </Sidebar>
 
       {/* Main content area */}
-      <main className="flex-grow relative h-dvh flex flex-col">
-        <div className="w-full flex-1">
-          {activeView === "main" ? mainContent : featureTableContent}
-        </div>
+      <main
+        className="flex-grow relative h-dvh flex flex-col overflow-hidden"
+        onMouseMove={handleMouseMove}
+        onMouseLeave={handleMouseLeave}
+      >
 
-        {/* Desktop FAB */}
-        {/* Feature table moved to dialog (triggered from sidebar), 
-        could reuse this for something else maybe */}
-        {/* <div className="fixed bottom-6 right-6 hidden md:flex flex-col items-center gap-3 z-50">
-          <button
-            onClick={() =>
-              setActiveView(activeView === "main" ? "features" : "main")
-            }
-            className="p-3 cursor-pointer rounded-full bg-gray-400/50 text-white hover:bg-black/60 backdrop-blur-xs transition-all duration-200"
-            aria-label="Switch view"
+        {/* Sliding panes */}
+        <div className="flex-1 relative overflow-hidden">
+          <div
+            className="flex h-full transition-transform duration-500 ease-in-out"
+            style={{
+              width: "200%",
+              transform: activePage === "primary" ? "translateX(0)" : "translateX(-50%)",
+            }}
           >
-            {activeView === "main" ? <ListChecks size={24} /> : <X size={24} />}
-          </button>
-        </div> */}
+            {/* Primary pane */}
+            <div className="relative h-full shrink-0" style={{ width: "50%" }}>
+              {activeView === "main" ? mainContent : featureTableContent}
+
+              {/* Right-edge chevron — only visible when cursor is within EDGE_THRESHOLD of right edge */}
+              <div
+                className="absolute right-0 top-0 h-full w-16 flex items-center justify-center cursor-pointer z-20"
+                onClick={() => setActivePage("secondary")}
+              >
+                <ChevronRight
+                  className={cn(
+                    "w-10 h-10 text-white/40 transition-all duration-200 ease-out drop-shadow-lg",
+                    activePage === "primary" && nearRightEdge
+                      ? "opacity-100 translate-x-0"
+                      : "opacity-0 translate-x-3 pointer-events-none"
+                  )}
+                />
+              </div>
+            </div>
+
+            {/* Secondary pane (blank for now) */}
+            <div className="relative h-full shrink-0 bg-[#101211]" style={{ width: "50%" }}>
+              {/* Left-edge chevron — only visible when cursor is within EDGE_THRESHOLD of left edge */}
+              <div
+                className="absolute left-0 top-0 h-full w-16 flex items-center justify-center cursor-pointer z-20"
+                onClick={() => setActivePage("primary")}
+              >
+                <ChevronLeft
+                  className={cn(
+                    "w-10 h-10 text-white/40 transition-all duration-200 ease-out drop-shadow-lg",
+                    activePage === "secondary" && nearLeftEdge
+                      ? "opacity-100 translate-x-0"
+                      : "opacity-0 -translate-x-3 pointer-events-none"
+                  )}
+                />
+              </div>
+            </div>
+          </div>
+        </div>
 
         {/* Mobile Bottom Navbar */}
         <BottomNavbar
