@@ -19,6 +19,10 @@ export default defineConfig({
         changeOrigin: true,
         ws: true, // WebSocket proxying
       },
+      "/compare/videos/": {
+        target: "http://127.0.0.1:8000",
+        changeOrigin: true,
+      },
     },
   },
 });
