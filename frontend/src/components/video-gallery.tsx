@@ -13,7 +13,11 @@ function randomSegmentIndex(): number {
   return Math.floor(Math.random() * PREVIEW_SEGMENTS.length);
 }
 
-const VideoCard: React.FC<Video> = ({ name, url }) => {
+interface VideoCardProps extends Video {
+  onSelect?: (video: Video) => void;
+}
+
+const VideoCard: React.FC<VideoCardProps> = ({ id, name, url, onSelect }) => {
   const videoRef = useRef<HTMLVideoElement>(null);
   const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const segmentIndexRef = useRef<number>(randomSegmentIndex());
@@ -77,9 +81,10 @@ const VideoCard: React.FC<Video> = ({ name, url }) => {
 
   return (
     <div
-      className="rounded-[4px] border border-[#2e3330] bg-[#1d201f] overflow-hidden transition-colors duration-150 hover:border-[#29a383]/40"
+      className="rounded-[4px] border border-[#2e3330] bg-[#1d201f] overflow-hidden transition-colors duration-150 hover:border-[#29a383]/40 cursor-pointer"
       onMouseEnter={handleMouseEnter}
       onMouseLeave={handleMouseLeave}
+      onClick={() => onSelect?.({ id, name, url })}
     >
       <div className="relative w-full" style={{ aspectRatio: "16 / 9" }}>
         <video
@@ -99,7 +104,11 @@ const VideoCard: React.FC<Video> = ({ name, url }) => {
   );
 };
 
-export const VideoGallery: React.FC = () => {
+interface VideoGalleryProps {
+  onSelect?: (video: Video) => void;
+}
+
+export const VideoGallery: React.FC<VideoGalleryProps> = ({ onSelect }) => {
   const [videos, setVideos] = useState<Video[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -171,6 +180,7 @@ export const VideoGallery: React.FC = () => {
                 id={video.id}
                 name={video.name}
                 url={video.url}
+                onSelect={onSelect}
               />
             ))}
           </div>

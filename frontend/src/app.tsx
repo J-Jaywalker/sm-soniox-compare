@@ -5,6 +5,7 @@ import { ProviderGrid } from "@/components/provider-grid";
 import { ModelDataProvider } from "@/contexts/model-data-context";
 import { FeatureComparisonTable } from "@/components/feature-comparison-table";
 import { FeatureProvider, useFeatures } from "@/contexts/feature-context";
+import { VideoModeProvider } from "@/contexts/video-mode-context";
 
 
 function App() {
@@ -46,11 +47,13 @@ function AppCore() {
   return (
     <ModelDataProvider>
       <ComparisonProvider>
-        <MainLayout
-          sidebarContent={<ControlPanel />}
-          mainContent={<ProviderGrid />}
-          featureTableContent={<FeatureComparisonTable />}
-        />
+        <VideoModeProvider>
+          <MainLayout
+            sidebarContent={<ControlPanel />}
+            mainContent={<ProviderGrid />}
+            featureTableContent={<FeatureComparisonTable />}
+          />
+        </VideoModeProvider>
       </ComparisonProvider>
     </ModelDataProvider>
   );

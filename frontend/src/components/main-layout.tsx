@@ -10,9 +10,10 @@ import {
 } from "@/components/ui/sheet";
 import { Button } from "./ui/button";
 import { BottomNavbar } from "./bottom-navbar";
-import { VideoGallery } from "./video-gallery";
+import { VideoSection } from "./video-section";
 import { useComparison } from "@/contexts/comparison-context";
 import { useSwipe } from "@/hooks/use-swipe";
+import { useVideoMode } from "@/contexts/video-mode-context";
 
 
 interface MainLayoutProps {
@@ -28,8 +29,8 @@ export const MainLayout: React.FC<MainLayoutProps> = ({
 }) => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [activeView, setActiveView] = useState<"main" | "features">("main");
-  const [activePage, setActivePage] = useState<"primary" | "secondary">("primary");
   const [nearRightEdge, setNearRightEdge] = useState(false);
+  const { activePage, setActivePage, transcriptionState, stopVideoTranscription } = useVideoMode();
   const [nearLeftEdge, setNearLeftEdge] = useState(false);
 
   const EDGE_THRESHOLD = 64;
@@ -46,6 +47,11 @@ export const MainLayout: React.FC<MainLayoutProps> = ({
     setNearLeftEdge(false);
   }, []);
   const { recordingState, stopRecording } = useComparison();
+
+  const handleNavigateToPrimary = useCallback(() => {
+    if (transcriptionState !== "idle") stopVideoTranscription(true);
+    setActivePage("primary");
+  }, [transcriptionState, stopVideoTranscription, setActivePage]);
 
   const swipeHandlers = useSwipe({
     onSwipeRight: () => {
@@ -104,11 +110,11 @@ export const MainLayout: React.FC<MainLayoutProps> = ({
 
             {/* Secondary pane — video gallery */}
             <div className="relative h-full shrink-0 bg-[#101211] overflow-y-auto" style={{ width: "50%" }}>
-              <VideoGallery />
+              <VideoSection />
               {/* Left-edge chevron — only visible when cursor is within EDGE_THRESHOLD of left edge */}
               <div
                 className="absolute left-0 top-0 h-full w-16 flex items-center justify-center cursor-pointer z-20"
-                onClick={() => setActivePage("primary")}
+                onClick={handleNavigateToPrimary}
               >
                 <ChevronLeft
                   className={cn(
