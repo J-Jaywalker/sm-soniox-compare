@@ -3,11 +3,10 @@ import { useComparison } from "@/contexts/comparison-context";
 import { AudioWaveButton } from "../audio-wave-button";
 import { useUrlSettings } from "@/hooks/use-url-settings";
 import { useVideoMode } from "@/contexts/video-mode-context";
-import { PRIMARY_PROVIDER } from "@/lib/provider-features";
-import type { ProviderName } from "@/lib/provider-features";
+import { PRIMARY_PROVIDER, type ProviderName } from "@/lib/provider-features";
 
 export const ActionPanel = () => {
-  const { isValid, settings, getSettingsAsUrlParams } = useUrlSettings();
+  const { isValid, settings } = useUrlSettings();
   const {
     recordingState,
     startRecording,
@@ -15,6 +14,7 @@ export const ActionPanel = () => {
   } = useComparison();
   const {
     isVideoMode,
+    videoPlayerOpen,
     transcriptionState,
     startVideoTranscription,
     stopVideoTranscription,
@@ -35,7 +35,19 @@ export const ActionPanel = () => {
       PRIMARY_PROVIDER,
       ...settings.selectedProviders.filter((p) => p !== PRIMARY_PROVIDER),
     ];
-    await startVideoTranscription(getSettingsAsUrlParams(), allProviders);
+    // Video transcription uses minimal params — no speaker diarization, audio events, etc.
+    const params = new URLSearchParams();
+    params.set("mode", "stt");
+    params.set("operating_point", settings.operatingPoint);
+    params.set("enable_partials", String(settings.enablePartials));
+    params.set("context", "");
+    params.set("enable_speaker_diarization", "false");
+    params.set("enable_speaker_identification", "false");
+    params.set("enable_audio_events", "false");
+    params.set("enable_language_identification", "false");
+    params.set("enable_endpoint_detection", "false");
+    allProviders.forEach((p) => params.append("providers", p));
+    await startVideoTranscription(params.toString(), allProviders);
   };
 
   if (isVideoMode) {
@@ -46,7 +58,7 @@ export const ActionPanel = () => {
             onClick={isVideoTranscribing ? () => stopVideoTranscription(true) : handleStartVideo}
             variant={isVideoTranscribing ? "destructive" : "default"}
             className={`flex-1 ${isVideoTranscribing ? "" : "bg-soniox"}`}
-            disabled={!isValid}
+            disabled={!isValid || !videoPlayerOpen}
           >
             {isVideoTranscribing ? (
               <div className="flex flex-row items-center gap-x-2">

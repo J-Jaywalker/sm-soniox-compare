@@ -12,6 +12,7 @@ import { AudioEventsDialog, type AudioEventType } from "../audio-events-dialog";
 import { EnrollSpeakerDialog } from "../enroll-speaker-dialog";
 import { ManageSpeakersDialog } from "../manage-speakers-dialog";
 import { cn } from "@/lib/utils";
+import { useVideoMode } from "@/contexts/video-mode-context";
 
 const SectionLabel = ({
   children,
@@ -92,6 +93,7 @@ export const ControlPanel: React.FC = () => {
     return () => document.removeEventListener("mousedown", handleClick);
   }, [secretMenuOpen]);
 
+  const { isVideoMode } = useVideoMode();
   const isRecording = recordingState === "recording";
   const isStarting = recordingState === "starting";
 
@@ -198,7 +200,8 @@ export const ControlPanel: React.FC = () => {
 
       {/* Scrollable content */}
       <div className="flex-1 overflow-y-auto">
-        <div className="flex flex-col divide-y divide-[#1e201f]">
+        <div className="flex flex-col">
+          <div className="flex flex-col divide-y divide-[#1e201f]">
           {/* Providers */}
           <section className="px-4 py-5 space-y-3">
             <SectionLabel>Providers</SectionLabel>
@@ -309,147 +312,165 @@ export const ControlPanel: React.FC = () => {
             </div>
           </section>
 
-          {/* Settings */}
-          <section className="px-4 py-5 space-y-3">
-            <SectionLabel>Settings</SectionLabel>
-            <div className="space-y-1.5">
-              {/* Speaker Diarization — top of settings */}
-              {settingsItems.map(({ id, label, checked, onChange }) => (
-                <label
-                  key={id}
-                  htmlFor={id}
-                  className={cn(
-                    "flex items-center gap-3 px-3 py-2.5 border rounded-[4px] cursor-pointer transition-all duration-150 select-none",
-                    checked
-                      ? "border-[#29a383]/40 bg-[#29a383]/8"
-                      : "border-[#2e3330] hover:border-[#29a383]/25 hover:bg-[#29a383]/4",
-                    (isRecording || isStarting) &&
-                      "opacity-40 cursor-not-allowed pointer-events-none"
-                  )}
-                >
-                  <Checkbox
-                    id={id}
-                    checked={checked}
-                    onCheckedChange={(c) => onChange(Boolean(c))}
-                    disabled={isRecording || isStarting}
-                    className="border-[#37403e] data-[state=checked]:bg-[#29a383] data-[state=checked]:border-[#29a383] shrink-0"
-                  />
-                  <span className="text-[0.82rem] font-medium text-[#e6edeb]">
-                    {label}
-                  </span>
-                </label>
-              ))}
+          </div>{/* end divide-y group */}
 
-              {/* Custom Dictionary — special row with Edit button */}
-              <div
-                className={cn(
-                  "flex items-center gap-3 px-3 py-2.5 border rounded-[4px] transition-all duration-150 select-none",
-                  enableCustomDictionary
-                    ? "border-[#29a383]/40 bg-[#29a383]/8"
-                    : "border-[#2e3330] hover:border-[#29a383]/25 hover:bg-[#29a383]/4",
-                  (isRecording || isStarting) &&
-                    "opacity-40 cursor-not-allowed pointer-events-none"
-                )}
-              >
-                <Checkbox
-                  id="enable-custom-dictionary"
-                  checked={enableCustomDictionary}
-                  onCheckedChange={handleCustomDictChange}
-                  disabled={isRecording || isStarting}
-                  className="border-[#37403e] data-[state=checked]:bg-[#29a383] data-[state=checked]:border-[#29a383] shrink-0 cursor-pointer"
-                />
-                <label
-                  htmlFor="enable-custom-dictionary"
-                  className="flex-1 text-[0.82rem] font-medium text-[#e6edeb] cursor-pointer"
-                >
-                  Custom Dictionary
-                </label>
-                {enableCustomDictionary && (
-                  <button
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      setDictDialogOpen(true);
-                    }}
-                    className="px-2 py-0.5 rounded-[3px] border border-[#2e3330] text-[0.7rem] font-medium text-[#b4c3be] hover:border-[#29a383]/50 hover:text-[#29a383] hover:bg-[#29a383]/6 transition-all duration-150 shrink-0 cursor-pointer"
+          {/* Settings — animated out in video mode */}
+          <div
+            className="grid"
+            style={{
+              gridTemplateRows: isVideoMode ? "0fr" : "1fr",
+              transition: "grid-template-rows 320ms ease-in-out",
+            }}
+          >
+            <div
+              className={cn(
+                "overflow-hidden transition-opacity duration-200",
+                isVideoMode ? "opacity-0" : "opacity-100"
+              )}
+            >
+              <section className="border-t border-[#1e201f] px-4 py-5 space-y-3">
+                <SectionLabel>Settings</SectionLabel>
+                <div className="space-y-1.5">
+                  {/* Speaker Diarization */}
+                  {settingsItems.map(({ id, label, checked, onChange }) => (
+                    <label
+                      key={id}
+                      htmlFor={id}
+                      className={cn(
+                        "flex items-center gap-3 px-3 py-2.5 border rounded-[4px] cursor-pointer transition-all duration-150 select-none",
+                        checked
+                          ? "border-[#29a383]/40 bg-[#29a383]/8"
+                          : "border-[#2e3330] hover:border-[#29a383]/25 hover:bg-[#29a383]/4",
+                        (isRecording || isStarting) &&
+                          "opacity-40 cursor-not-allowed pointer-events-none"
+                      )}
+                    >
+                      <Checkbox
+                        id={id}
+                        checked={checked}
+                        onCheckedChange={(c) => onChange(Boolean(c))}
+                        disabled={isRecording || isStarting}
+                        className="border-[#37403e] data-[state=checked]:bg-[#29a383] data-[state=checked]:border-[#29a383] shrink-0"
+                      />
+                      <span className="text-[0.82rem] font-medium text-[#e6edeb]">
+                        {label}
+                      </span>
+                    </label>
+                  ))}
+
+                  {/* Custom Dictionary */}
+                  <div
+                    className={cn(
+                      "flex items-center gap-3 px-3 py-2.5 border rounded-[4px] transition-all duration-150 select-none",
+                      enableCustomDictionary
+                        ? "border-[#29a383]/40 bg-[#29a383]/8"
+                        : "border-[#2e3330] hover:border-[#29a383]/25 hover:bg-[#29a383]/4",
+                      (isRecording || isStarting) &&
+                        "opacity-40 cursor-not-allowed pointer-events-none"
+                    )}
                   >
-                    Edit
-                  </button>
-                )}
-              </div>
+                    <Checkbox
+                      id="enable-custom-dictionary"
+                      checked={enableCustomDictionary}
+                      onCheckedChange={handleCustomDictChange}
+                      disabled={isRecording || isStarting}
+                      className="border-[#37403e] data-[state=checked]:bg-[#29a383] data-[state=checked]:border-[#29a383] shrink-0 cursor-pointer"
+                    />
+                    <label
+                      htmlFor="enable-custom-dictionary"
+                      className="flex-1 text-[0.82rem] font-medium text-[#e6edeb] cursor-pointer"
+                    >
+                      Custom Dictionary
+                    </label>
+                    {enableCustomDictionary && (
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setDictDialogOpen(true);
+                        }}
+                        className="px-2 py-0.5 rounded-[3px] border border-[#2e3330] text-[0.7rem] font-medium text-[#b4c3be] hover:border-[#29a383]/50 hover:text-[#29a383] hover:bg-[#29a383]/6 transition-all duration-150 shrink-0 cursor-pointer"
+                      >
+                        Edit
+                      </button>
+                    )}
+                  </div>
 
-              {/* Speaker Identification — special row with Enroll/Manage buttons */}
-              <div
-                className={cn(
-                  "flex items-center gap-3 px-3 py-2.5 border rounded-[4px] transition-all duration-150 select-none",
-                  enableSpeakerIdentification
-                    ? "border-[#29a383]/40 bg-[#29a383]/8"
-                    : "border-[#2e3330] hover:border-[#29a383]/25 hover:bg-[#29a383]/4",
-                  (isRecording || isStarting) &&
-                    "opacity-40 cursor-not-allowed pointer-events-none"
-                )}
-              >
-                <Checkbox
-                  id="enable-speaker-identification"
-                  checked={enableSpeakerIdentification}
-                  onCheckedChange={(c) =>
-                    setEnableSpeakerIdentification(Boolean(c))
-                  }
-                  disabled={isRecording || isStarting}
-                  className="border-[#37403e] data-[state=checked]:bg-[#29a383] data-[state=checked]:border-[#29a383] shrink-0 cursor-pointer"
-                />
-                <label
-                  htmlFor="enable-speaker-identification"
-                  className="flex-1 text-[0.82rem] font-medium text-[#e6edeb] cursor-pointer"
-                >
-                  Speaker Identification
-                </label>
-              </div>
-
-              {/* Audio Events — special row with Edit button */}
-              <div
-                className={cn(
-                  "flex items-center gap-3 px-3 py-2.5 border rounded-[4px] transition-all duration-150 select-none",
-                  enableAudioEvents
-                    ? "border-[#29a383]/40 bg-[#29a383]/8"
-                    : "border-[#2e3330] hover:border-[#29a383]/25 hover:bg-[#29a383]/4",
-                  (isRecording || isStarting) &&
-                    "opacity-40 cursor-not-allowed pointer-events-none"
-                )}
-              >
-                <Checkbox
-                  id="enable-audio-events"
-                  checked={enableAudioEvents}
-                  onCheckedChange={handleAudioEventsChange}
-                  disabled={isRecording || isStarting}
-                  className="border-[#37403e] data-[state=checked]:bg-[#29a383] data-[state=checked]:border-[#29a383] shrink-0 cursor-pointer"
-                />
-                <label
-                  htmlFor="enable-audio-events"
-                  className="flex-1 min-w-0 cursor-pointer"
-                >
-                  <span className="text-[0.82rem] font-medium text-[#e6edeb]">
-                    Audio Events
-                  </span>
-                </label>
-                {enableAudioEvents && (
-                  <button
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      setAudioEventsDialogOpen(true);
-                    }}
-                    className="px-2 py-0.5 rounded-[3px] border border-[#2e3330] text-[0.7rem] font-medium text-[#b4c3be] hover:border-[#29a383]/50 hover:text-[#29a383] hover:bg-[#29a383]/6 transition-all duration-150 shrink-0 cursor-pointer"
+                  {/* Speaker Identification */}
+                  <div
+                    className={cn(
+                      "flex items-center gap-3 px-3 py-2.5 border rounded-[4px] transition-all duration-150 select-none",
+                      enableSpeakerIdentification
+                        ? "border-[#29a383]/40 bg-[#29a383]/8"
+                        : "border-[#2e3330] hover:border-[#29a383]/25 hover:bg-[#29a383]/4",
+                      (isRecording || isStarting) &&
+                        "opacity-40 cursor-not-allowed pointer-events-none"
+                    )}
                   >
-                    Edit
-                  </button>
-                )}
-              </div>
-            </div>
+                    <Checkbox
+                      id="enable-speaker-identification"
+                      checked={enableSpeakerIdentification}
+                      onCheckedChange={(c) =>
+                        setEnableSpeakerIdentification(Boolean(c))
+                      }
+                      disabled={isRecording || isStarting}
+                      className="border-[#37403e] data-[state=checked]:bg-[#29a383] data-[state=checked]:border-[#29a383] shrink-0 cursor-pointer"
+                    />
+                    <label
+                      htmlFor="enable-speaker-identification"
+                      className="flex-1 text-[0.82rem] font-medium text-[#e6edeb] cursor-pointer"
+                    >
+                      Speaker Identification
+                    </label>
+                  </div>
 
-            <div className="pt-1 hidden sm:flex w-full">
-              <FeatureComparisonDialog />
+                  {/* Audio Events */}
+                  <div
+                    className={cn(
+                      "flex items-center gap-3 px-3 py-2.5 border rounded-[4px] transition-all duration-150 select-none",
+                      enableAudioEvents
+                        ? "border-[#29a383]/40 bg-[#29a383]/8"
+                        : "border-[#2e3330] hover:border-[#29a383]/25 hover:bg-[#29a383]/4",
+                      (isRecording || isStarting) &&
+                        "opacity-40 cursor-not-allowed pointer-events-none"
+                    )}
+                  >
+                    <Checkbox
+                      id="enable-audio-events"
+                      checked={enableAudioEvents}
+                      onCheckedChange={handleAudioEventsChange}
+                      disabled={isRecording || isStarting}
+                      className="border-[#37403e] data-[state=checked]:bg-[#29a383] data-[state=checked]:border-[#29a383] shrink-0 cursor-pointer"
+                    />
+                    <label
+                      htmlFor="enable-audio-events"
+                      className="flex-1 min-w-0 cursor-pointer"
+                    >
+                      <span className="text-[0.82rem] font-medium text-[#e6edeb]">
+                        Audio Events
+                      </span>
+                    </label>
+                    {enableAudioEvents && (
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setAudioEventsDialogOpen(true);
+                        }}
+                        className="px-2 py-0.5 rounded-[3px] border border-[#2e3330] text-[0.7rem] font-medium text-[#b4c3be] hover:border-[#29a383]/50 hover:text-[#29a383] hover:bg-[#29a383]/6 transition-all duration-150 shrink-0 cursor-pointer"
+                      >
+                        Edit
+                      </button>
+                    )}
+                  </div>
+                </div>
+
+                <div className="pt-1 hidden sm:flex w-full">
+                  <FeatureComparisonDialog />
+                </div>
+              </section>
             </div>
-          </section>
-        </div>
+          </div>
+
+        </div>{/* end outer flex col */}
       </div>
 
       <ActionPanel />

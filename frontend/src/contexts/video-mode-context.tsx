@@ -40,7 +40,7 @@ export const VideoModeProvider: React.FC<{ children: React.ReactNode }> = ({
   const { state, outputs, activeProviders, start, stop, cleanup } =
     useVideoTranscription();
 
-  const isVideoMode = activePage === "secondary" && videoPlayerOpen;
+  const isVideoMode = activePage === "secondary";
 
   const startVideoTranscription = useCallback(
     async (urlParams: string, providers: ProviderName[]) => {
