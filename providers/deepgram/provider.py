@@ -69,25 +69,32 @@ class DeepgramProvider(BaseProvider):
 
             # Note that punctuation does not work.
             # https://github.com/deepgram/deepgram-js-sdk/issues/386
-            url_params_dict = {
-                "language": language,
-                "model": self.config.service.model,
-                "punctuate": "true",
-                "interim_results": "true",
-                "encoding": "linear16",
-                "sample_rate": self.config.common.sample_rate,
-                "diarize": (
-                    "true" if self.config.params.enable_speaker_diarization else "false"
-                ),
-                "utterances": "true",
-                "dictation": "true",
-                "numerals": "true",
-                "smart_format": "true",
-                "measurements": "true",
-                "endpointing": endpointing,
-            }
+            url_params: list[tuple[str, Any]] = [
+                ("language", language),
+                ("model", self.config.service.model),
+                ("punctuate", "true"),
+                ("interim_results", "true"),
+                ("encoding", "linear16"),
+                ("sample_rate", self.config.common.sample_rate),
+                ("diarize", "true" if self.config.params.enable_speaker_diarization else "false"),
+                ("utterances", "true"),
+                ("dictation", "true"),
+                ("numerals", "true"),
+                ("smart_format", "true"),
+                ("measurements", "true"),
+                ("endpointing", endpointing),
+            ]
 
-            query_string = urlencode(url_params_dict)
+            # Nova-3 uses `keyterm` (no intensifier); older models use `keywords=WORD:INTENSIFIER`.
+            # sounds_like is not supported by Deepgram so only content is used.
+            # https://developers.deepgram.com/docs/keyterm
+            if self.config.params.additional_vocab:
+                for entry in self.config.params.additional_vocab:
+                    content = entry.get("content", "").strip()
+                    if content:
+                        url_params.append(("keyterm", content))
+
+            query_string = urlencode(url_params)
             full_url = f"{self.config.service.websocket_url}?{query_string}"
 
             self.websocket = await websockets.connect(
