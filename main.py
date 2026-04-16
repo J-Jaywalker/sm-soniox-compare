@@ -2,6 +2,7 @@ import asyncio
 import importlib
 import json
 import os
+from pathlib import Path
 from typing import Dict, List, Any
 
 from dotenv import load_dotenv
@@ -403,6 +404,40 @@ async def enroll_speaker(
         except Exception:
             pass
 
+
+VIDEOS_DIR = Path(__file__).parent / "Videos"
+
+
+@app.get("/compare/api/videos")
+async def list_videos():
+    videos = []
+    if VIDEOS_DIR.is_dir():
+        for folder in sorted(VIDEOS_DIR.iterdir()):
+            if not folder.is_dir():
+                continue
+            mp4_files = list(folder.glob("*.mp4"))
+            if not mp4_files:
+                continue
+            mp4_path = mp4_files[0]
+            display_name = (
+                folder.name.replace("-", " ")
+                .replace("_", " ")
+                .title()
+            )
+            videos.append({
+                "id": folder.name,
+                "name": display_name,
+                "url": f"/compare/videos/{folder.name}/{mp4_path.name}",
+            })
+    return {"videos": videos}
+
+
+if VIDEOS_DIR.is_dir():
+    app.mount(
+        "/compare/videos",
+        StaticFiles(directory=str(VIDEOS_DIR)),
+        name="videos",
+    )
 
 if os.path.exists("frontend/dist"):
     app.mount("/compare/ui", StaticFiles(directory="frontend/dist"), name="static")

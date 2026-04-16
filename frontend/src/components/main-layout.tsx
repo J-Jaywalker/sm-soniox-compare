@@ -10,6 +10,7 @@ import {
 } from "@/components/ui/sheet";
 import { Button } from "./ui/button";
 import { BottomNavbar } from "./bottom-navbar";
+import { VideoGallery } from "./video-gallery";
 import { useComparison } from "@/contexts/comparison-context";
 import { useSwipe } from "@/hooks/use-swipe";
 
@@ -101,8 +102,9 @@ export const MainLayout: React.FC<MainLayoutProps> = ({
               </div>
             </div>
 
-            {/* Secondary pane (blank for now) */}
-            <div className="relative h-full shrink-0 bg-[#101211]" style={{ width: "50%" }}>
+            {/* Secondary pane — video gallery */}
+            <div className="relative h-full shrink-0 bg-[#101211] overflow-y-auto" style={{ width: "50%" }}>
+              <VideoGallery />
               {/* Left-edge chevron — only visible when cursor is within EDGE_THRESHOLD of left edge */}
               <div
                 className="absolute left-0 top-0 h-full w-16 flex items-center justify-center cursor-pointer z-20"
