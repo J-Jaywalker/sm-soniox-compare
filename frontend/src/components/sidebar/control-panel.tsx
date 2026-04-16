@@ -323,10 +323,13 @@ export const ControlPanel: React.FC = () => {
             }}
           >
             <div
-              className={cn(
-                "overflow-hidden transition-opacity duration-200",
-                isVideoMode ? "opacity-0" : "opacity-100"
-              )}
+              className="overflow-hidden"
+              style={{
+                opacity: isVideoMode ? 0 : 1,
+                transition: isVideoMode
+                  ? "opacity 200ms ease-in-out"
+                  : "opacity 120ms ease-in-out 280ms",
+              }}
             >
               <section className="border-t border-[#1e201f] px-4 py-5 space-y-3">
                 <SectionLabel>Settings</SectionLabel>
