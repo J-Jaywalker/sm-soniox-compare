@@ -382,26 +382,23 @@ class SpeechmaticsProvider(BaseProvider):
 
     @staticmethod
     def get_available_features():
-        # Single multilingual model.
-        # Note from website: "Please note, this is currently only supported with Batch Transcriptions."
         supported = FeatureStatus.supported()
-        unsupported = FeatureStatus.unsupported()
         return SupportedFeatures(
             name="Speechmatics",
             model="realtime-enhanced",
-            single_multilingual_model=unsupported,
-            language_hints=unsupported,  # But language can be selected or default language can be used.
-            language_identification=unsupported,  # https://docs.speechmatics.com/features-other/lang-id
+            single_multilingual_model=supported,
+            language_hints=supported,
+            language_identification=supported,
             speaker_diarization=supported,  # https://docs.speechmatics.com/features/diarization
             customization=supported,  # https://docs.speechmatics.com/features/custom-dictionary
             timestamps=supported,  # https://docs.speechmatics.com/features-other/word-alignment
-            confidence_scores=supported,  # https://docs.speechmatics.com/features/entities#example-transcription-output
+            confidence_scores=supported,
             translation_one_way=supported,  # https://docs.speechmatics.com/features-other/translation
-            translation_two_way=unsupported,
-            endpoint_detection=unsupported,  # True previously, but could not find this feature.
+            translation_two_way=supported,
+            endpoint_detection=supported,
             manual_finalization=supported,
             real_time_latency_config=supported,  # https://docs.speechmatics.com/features/realtime-latency
-            speaker_identification=unsupported,
-            turn_detection=unsupported,
+            speaker_identification=supported,  # https://docs.speechmatics.com/features/speaker-identification
+            turn_detection=supported,
             audio_events=supported,
         )

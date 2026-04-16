@@ -283,6 +283,33 @@ export const ControlPanel: React.FC = () => {
           <section className="px-4 py-5 space-y-3">
             <SectionLabel>Settings</SectionLabel>
             <div className="space-y-1.5">
+              {/* Speaker Diarization — top of settings */}
+              {settingsItems.map(({ id, label, checked, onChange }) => (
+                <label
+                  key={id}
+                  htmlFor={id}
+                  className={cn(
+                    "flex items-center gap-3 px-3 py-2.5 border rounded-[4px] cursor-pointer transition-all duration-150 select-none",
+                    checked
+                      ? "border-[#29a383]/40 bg-[#29a383]/8"
+                      : "border-[#2e3330] hover:border-[#29a383]/25 hover:bg-[#29a383]/4",
+                    (isRecording || isStarting) &&
+                      "opacity-40 cursor-not-allowed pointer-events-none"
+                  )}
+                >
+                  <Checkbox
+                    id={id}
+                    checked={checked}
+                    onCheckedChange={(c) => onChange(Boolean(c))}
+                    disabled={isRecording || isStarting}
+                    className="border-[#37403e] data-[state=checked]:bg-[#29a383] data-[state=checked]:border-[#29a383] shrink-0"
+                  />
+                  <span className="text-[0.82rem] font-medium text-[#e6edeb]">
+                    {label}
+                  </span>
+                </label>
+              ))}
+
               {/* Custom Dictionary — special row with Edit button */}
               <div
                 className={cn(
@@ -319,32 +346,6 @@ export const ControlPanel: React.FC = () => {
                   </button>
                 )}
               </div>
-
-              {settingsItems.map(({ id, label, checked, onChange }) => (
-                <label
-                  key={id}
-                  htmlFor={id}
-                  className={cn(
-                    "flex items-center gap-3 px-3 py-2.5 border rounded-[4px] cursor-pointer transition-all duration-150 select-none",
-                    checked
-                      ? "border-[#29a383]/40 bg-[#29a383]/8"
-                      : "border-[#2e3330] hover:border-[#29a383]/25 hover:bg-[#29a383]/4",
-                    (isRecording || isStarting) &&
-                      "opacity-40 cursor-not-allowed pointer-events-none"
-                  )}
-                >
-                  <Checkbox
-                    id={id}
-                    checked={checked}
-                    onCheckedChange={(c) => onChange(Boolean(c))}
-                    disabled={isRecording || isStarting}
-                    className="border-[#37403e] data-[state=checked]:bg-[#29a383] data-[state=checked]:border-[#29a383] shrink-0"
-                  />
-                  <span className="text-[0.82rem] font-medium text-[#e6edeb]">
-                    {label}
-                  </span>
-                </label>
-              ))}
 
               {/* Speaker Identification — special row with Enroll/Manage buttons */}
               <div
