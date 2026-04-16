@@ -178,7 +178,8 @@ class AzureProvider(BaseProvider):
                     auto_detect_source_language_config=auto_detect_lang_cfg,
                 )
 
-                self.recognizer.transcribing.connect(self._on_transcribing)
+                if self.config.params.enable_partials:
+                    self.recognizer.transcribing.connect(self._on_transcribing)
                 self.recognizer.transcribed.connect(self._on_transcribed)
                 self.recognizer.canceled.connect(self._on_canceled)
                 self.recognizer.start_transcribing_async()
@@ -209,7 +210,8 @@ class AzureProvider(BaseProvider):
                     translation_config=translation_config,
                     audio_config=audio_config,
                 )
-                self.recognizer.recognizing.connect(self._on_recognizing)
+                if self.config.params.enable_partials:
+                    self.recognizer.recognizing.connect(self._on_recognizing)
                 self.recognizer.recognized.connect(self._on_recognized)
                 self.recognizer.canceled.connect(self._on_canceled)
                 self.recognizer.start_continuous_recognition_async()
@@ -460,7 +462,6 @@ class AzureProvider(BaseProvider):
     def get_available_features():
         supported = FeatureStatus.supported()
         unsupported = FeatureStatus.unsupported()
-        partial = FeatureStatus.partial()
         return SupportedFeatures(
             name="Azure",
             model="en-US-Conversation",
