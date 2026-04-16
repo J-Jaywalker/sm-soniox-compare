@@ -30,6 +30,7 @@ export const VideoPlayerView: React.FC<VideoPlayerViewProps> = ({
     transcriptionOutputs,
     transcriptionActiveProviders,
     stopVideoTranscription,
+    resetVideoTranscription,
     cleanupVideoTranscription,
   } = useVideoMode();
 
@@ -61,7 +62,7 @@ export const VideoPlayerView: React.FC<VideoPlayerViewProps> = ({
   useEffect(() => () => cleanupVideoTranscription(), [cleanupVideoTranscription]);
 
   const handleBack = () => {
-    stopVideoTranscription(true);
+    resetVideoTranscription();
     onBack();
   };
 

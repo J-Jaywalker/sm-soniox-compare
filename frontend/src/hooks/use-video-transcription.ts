@@ -241,5 +241,15 @@ export function useVideoTranscription() {
     [stopTranscription]
   );
 
-  return { state, outputs, activeProviders, start, stop, cleanup };
+  const reset = useCallback(
+    (videoEl?: HTMLVideoElement | null) => {
+      if (videoEl) videoEl.pause();
+      stopTranscription();
+      setOutputs({});
+      setActiveProviders([]);
+    },
+    [stopTranscription]
+  );
+
+  return { state, outputs, activeProviders, start, stop, reset, cleanup };
 }

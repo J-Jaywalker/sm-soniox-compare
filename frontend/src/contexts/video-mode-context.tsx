@@ -25,6 +25,7 @@ interface VideoModeContextValue {
   transcriptionActiveProviders: ProviderName[];
   startVideoTranscription: (urlParams: string, providers: ProviderName[]) => Promise<void>;
   stopVideoTranscription: (pauseVideo?: boolean) => void;
+  resetVideoTranscription: () => void;
   cleanupVideoTranscription: () => void;
 }
 
@@ -37,7 +38,7 @@ export const VideoModeProvider: React.FC<{ children: React.ReactNode }> = ({
   const [videoPlayerOpen, setVideoPlayerOpen] = useState(false);
   const videoElRef = useRef<HTMLVideoElement | null>(null);
 
-  const { state, outputs, activeProviders, start, stop, cleanup } =
+  const { state, outputs, activeProviders, start, stop, reset, cleanup } =
     useVideoTranscription();
 
   const isVideoMode = activePage === "secondary";
@@ -57,6 +58,10 @@ export const VideoModeProvider: React.FC<{ children: React.ReactNode }> = ({
     [stop]
   );
 
+  const resetVideoTranscription = useCallback(() => {
+    reset(videoElRef.current ?? undefined);
+  }, [reset]);
+
   const value = useMemo<VideoModeContextValue>(
     () => ({
       activePage,
@@ -70,6 +75,7 @@ export const VideoModeProvider: React.FC<{ children: React.ReactNode }> = ({
       transcriptionActiveProviders: activeProviders,
       startVideoTranscription,
       stopVideoTranscription,
+      resetVideoTranscription,
       cleanupVideoTranscription: cleanup,
     }),
     [
@@ -81,6 +87,7 @@ export const VideoModeProvider: React.FC<{ children: React.ReactNode }> = ({
       activeProviders,
       startVideoTranscription,
       stopVideoTranscription,
+      resetVideoTranscription,
       cleanup,
     ]
   );
