@@ -30,7 +30,7 @@ export const MainLayout: React.FC<MainLayoutProps> = ({
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [activeView, setActiveView] = useState<"main" | "features">("main");
   const [nearRightEdge, setNearRightEdge] = useState(false);
-  const { activePage, setActivePage, transcriptionState, stopVideoTranscription } = useVideoMode();
+  const { activePage, setActivePage, videoPlayerOpen, transcriptionState, stopVideoTranscription } = useVideoMode();
   const [nearLeftEdge, setNearLeftEdge] = useState(false);
 
   const EDGE_THRESHOLD = 64;
@@ -94,7 +94,12 @@ export const MainLayout: React.FC<MainLayoutProps> = ({
 
               {/* Right-edge chevron — only visible when cursor is within EDGE_THRESHOLD of right edge */}
               <div
-                className="absolute right-0 top-0 h-full w-16 flex items-center justify-center cursor-pointer z-20"
+                className={cn(
+                  "absolute right-0 top-0 h-full w-16 flex items-center justify-center z-20",
+                  activePage === "primary" && nearRightEdge
+                    ? "cursor-pointer pointer-events-auto"
+                    : "pointer-events-none"
+                )}
                 onClick={() => setActivePage("secondary")}
               >
                 <ChevronRight
@@ -102,7 +107,7 @@ export const MainLayout: React.FC<MainLayoutProps> = ({
                     "w-10 h-10 text-white/40 transition-all duration-200 ease-out drop-shadow-lg",
                     activePage === "primary" && nearRightEdge
                       ? "opacity-100 translate-x-0"
-                      : "opacity-0 translate-x-3 pointer-events-none"
+                      : "opacity-0 translate-x-3"
                   )}
                 />
               </div>
@@ -113,15 +118,20 @@ export const MainLayout: React.FC<MainLayoutProps> = ({
               <VideoSection />
               {/* Left-edge chevron — only visible when cursor is within EDGE_THRESHOLD of left edge */}
               <div
-                className="absolute left-0 top-0 h-full w-16 flex items-center justify-center cursor-pointer z-20"
+                className={cn(
+                  "absolute left-0 top-0 h-full w-16 flex items-center justify-center z-20",
+                  activePage === "secondary" && nearLeftEdge && !videoPlayerOpen
+                    ? "cursor-pointer pointer-events-auto"
+                    : "pointer-events-none"
+                )}
                 onClick={handleNavigateToPrimary}
               >
                 <ChevronLeft
                   className={cn(
                     "w-10 h-10 text-white/40 transition-all duration-200 ease-out drop-shadow-lg",
-                    activePage === "secondary" && nearLeftEdge
+                    activePage === "secondary" && nearLeftEdge && !videoPlayerOpen
                       ? "opacity-100 translate-x-0"
-                      : "opacity-0 -translate-x-3 pointer-events-none"
+                      : "opacity-0 -translate-x-3"
                   )}
                 />
               </div>
