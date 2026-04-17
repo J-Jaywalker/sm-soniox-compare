@@ -104,7 +104,7 @@ export const VideoPlayerView: React.FC<VideoPlayerViewProps> = ({
       <div className="shrink-0 flex items-center gap-3 px-4 py-3 border-b border-[#2e3330] bg-[#0d1110]">
         <button
           onClick={handleBack}
-          className="flex items-center gap-1.5 text-[0.78rem] font-medium text-[#5f6e6a] hover:text-[#e6edeb] transition-colors shrink-0"
+          className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-[3px] text-[0.78rem] font-medium text-[#8da39d] border border-[#2e3330] bg-[#1d201f] hover:text-[#e6edeb] hover:border-[#3e4f4a] hover:bg-[#252b29] transition-colors shrink-0"
         >
           <ArrowLeft className="w-3.5 h-3.5" />
           Back
