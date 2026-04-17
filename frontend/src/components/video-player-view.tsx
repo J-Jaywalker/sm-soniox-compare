@@ -109,11 +109,7 @@ export const VideoPlayerView: React.FC<VideoPlayerViewProps> = ({
           <ArrowLeft className="w-3.5 h-3.5" />
           Back
         </button>
-        <p className="flex-1 text-[0.82rem] font-medium text-[#e6edeb] truncate text-center px-2">
-          {video.name}
-        </p>
-        {/* Spacer to keep title centred */}
-        <div className="shrink-0 w-12" />
+        <div className="flex-1" />
       </div>
 
       {/* Video player */}
