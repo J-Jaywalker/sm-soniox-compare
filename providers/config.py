@@ -98,6 +98,7 @@ class ProviderParams(BaseModel):
     enable_speaker_identification: bool = False
     enrolled_speakers: list[dict] = []  # [{"label": str, "identifiers": [str]}]
     translation: TranslationConfig | None = Field(default_factory=TranslationConfig)
+    video_mode: bool = False
 
 
 class ProviderConfig(BaseModel):

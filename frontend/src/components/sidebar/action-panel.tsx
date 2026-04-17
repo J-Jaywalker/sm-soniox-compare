@@ -46,6 +46,7 @@ export const ActionPanel = () => {
     params.set("enable_audio_events", "false");
     params.set("enable_language_identification", "false");
     params.set("enable_endpoint_detection", "false");
+    params.set("video_mode", "true");
     allProviders.forEach((p) => params.append("providers", p));
     await startVideoTranscription(params.toString(), allProviders);
   };

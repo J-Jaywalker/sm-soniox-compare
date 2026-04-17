@@ -118,6 +118,11 @@ class SpeechmaticsProvider(BaseProvider):
                     ],
                 }
 
+        if self.config.params.video_mode:
+            transcription["transcript_filtering_config"] = {
+                "remove_disfluencies": True
+            }
+
         if self.config.params.additional_vocab:
             vocab = []
             for entry in self.config.params.additional_vocab:

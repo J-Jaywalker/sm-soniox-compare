@@ -102,6 +102,9 @@ async def compare_websocket(
     enable_speaker_identification: bool = Query(
         default=False, description="Enable speaker identification"
     ),
+    video_mode: bool = Query(
+        default=False, description="Enable video mode (file transcription)"
+    ),
 ):
     await websocket.accept()
 
@@ -147,6 +150,7 @@ async def compare_websocket(
             audio_event_types=parsed_audio_event_types,
             enable_speaker_identification=enable_speaker_identification,
             translation=translation_cfg if mode == "mt" else None,
+        video_mode=video_mode,
         )
 
         if enable_speaker_identification:
