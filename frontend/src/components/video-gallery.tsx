@@ -1,5 +1,20 @@
 import React, { useRef, useState, useEffect, useCallback } from "react";
 
+const VIDEO_SUMMARIES: Record<string, string> = {
+  "aussie-interview":
+    "Woken at 2am by a car crashing into his mate's fish and chip shop, Daniel sprints into the street in his underwear to chase down the fleeing driver and flag the police.",
+  "england-usa":
+    "England and the USA trade chances in a tense World Cup group stage clash — Kane, Pulisic, and Sterling all go close — but neither side can find the net in a hard-fought goalless draw.",
+  "hamilton":
+    "Lewis Hamilton nurses a damaged tire through the final laps of a Grand Prix with Verstappen closing fast, before his team orders him to pull over and stop the car on track.",
+  "irish_rowing":
+    "Brothers Gary and Paul O'Donovan from Skibbereen secure Ireland's first ever Olympic rowing medal, a silver, and reflect on what it means for the sport and the people back home.",
+  "perseverance":
+    "NASA Mission Control narrates every tense second of Perseverance's descent through the Martian atmosphere — parachute, heat shield, skycrane — until touchdown is confirmed on the surface of Mars.",
+  "springbok":
+    "South Africa's World Cup-winning captain Siya Kolisi reflects on the team's journey from adversity to glory, and what lifting the trophy means for a divided nation pulling together as one.",
+};
+
 interface Video {
   id: string;
   name: string;
@@ -19,6 +34,7 @@ interface VideoCardProps extends Video {
 }
 
 const VideoCard: React.FC<VideoCardProps> = ({ id, name, url, refUrl, onSelect }) => {
+  const summary = VIDEO_SUMMARIES[id];
   const videoRef = useRef<HTMLVideoElement>(null);
   const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const segmentIndexRef = useRef<number>(randomSegmentIndex());
@@ -82,12 +98,12 @@ const VideoCard: React.FC<VideoCardProps> = ({ id, name, url, refUrl, onSelect }
 
   return (
     <div
-      className="rounded-[4px] border border-[#2e3330] bg-[#1d201f] overflow-hidden transition-colors duration-150 hover:border-[#29a383]/40 cursor-pointer"
+      className="group relative rounded-[4px] border border-[#2e3330] overflow-hidden cursor-pointer transition-[border-color,box-shadow] duration-200 hover:border-[#29a383]/50 hover:shadow-[0_0_0_1px_rgba(41,163,131,0.1)]"
       onMouseEnter={handleMouseEnter}
       onMouseLeave={handleMouseLeave}
       onClick={() => onSelect?.({ id, name, url, refUrl })}
     >
-      <div className="relative w-full" style={{ aspectRatio: "16 / 9" }}>
+      <div className="relative w-full bg-[#0d1110]" style={{ aspectRatio: "16 / 9" }}>
         <video
           ref={videoRef}
           src={url}
@@ -95,12 +111,19 @@ const VideoCard: React.FC<VideoCardProps> = ({ id, name, url, refUrl, onSelect }
           playsInline
           preload="metadata"
           loop={false}
-          className="absolute inset-0 w-full h-full object-cover bg-[#0d1110]"
+          className="absolute inset-0 w-full h-full object-cover"
         />
+
+        {/* Hover overlay — gradient scrim + summary */}
+        <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none">
+          <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-transparent" />
+          {summary && (
+            <p className="absolute bottom-0 left-0 right-0 px-3 pb-3 text-[0.72rem] leading-[1.6] text-white/90 font-mono">
+              {summary}
+            </p>
+          )}
+        </div>
       </div>
-      <p className="text-[0.82rem] font-medium text-[#e6edeb] px-3 py-2 truncate">
-        {name}
-      </p>
     </div>
   );
 };
@@ -174,7 +197,7 @@ export const VideoGallery: React.FC<VideoGalleryProps> = ({ onSelect }) => {
         )}
 
         {!loading && !error && videos.length > 0 && (
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             {videos.map((video) => (
               <VideoCard
                 key={video.id}
