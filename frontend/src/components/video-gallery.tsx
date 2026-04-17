@@ -116,9 +116,9 @@ const VideoCard: React.FC<VideoCardProps> = ({ id, name, url, refUrl, onSelect }
 
         {/* Hover overlay — gradient scrim + summary */}
         <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none">
-          <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-transparent" />
+          <div className="absolute inset-0 bg-gradient-to-t from-black/95 via-black/60 to-transparent" />
           {summary && (
-            <p className="absolute bottom-0 left-0 right-0 px-3 pb-3 text-[0.72rem] leading-[1.6] text-white/90 font-mono">
+            <p className="absolute bottom-0 left-0 right-0 px-4 pb-4 text-[1rem] leading-[1.6] text-[#e6edeb] font-sans font-medium tracking-[0.01em] [text-shadow:0_1px_4px_rgba(0,0,0,0.9)]">
               {summary}
             </p>
           )}
