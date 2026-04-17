@@ -103,7 +103,10 @@ export const VideoPlayerView: React.FC<VideoPlayerViewProps> = ({
       <div className="flex-1 min-h-0 flex overflow-hidden border-t border-[#2e3330]">
         {displayProviders.map((provider, i) => {
           const output = transcriptionOutputs[provider];
-          const modelName = providerFeatures?.[provider]?.model as string | undefined;
+          const subtitle =
+            provider === "speechmatics"
+              ? `realtime-${settings.operatingPoint}`
+              : (providerFeatures?.[provider]?.model as string | undefined);
           return (
             <div
               key={provider}
@@ -113,12 +116,12 @@ export const VideoPlayerView: React.FC<VideoPlayerViewProps> = ({
               )}
             >
               <div className="shrink-0 py-2 px-3 border-b border-[#2e3330] bg-[#1d201f] text-center">
-                <p className="text-[0.78rem] font-semibold text-[#e6edeb] capitalize">
+                <p className={cn("text-[0.78rem] font-semibold capitalize", provider === PRIMARY_PROVIDER ? "text-soniox" : "text-[#e6edeb]")}>
                   {provider}
                 </p>
-                {modelName && (
+                {subtitle && (
                   <p className="text-[0.65rem] font-mono text-[#5f6e6a] mt-0.5">
-                    {modelName}
+                    {subtitle}
                   </p>
                 )}
               </div>
