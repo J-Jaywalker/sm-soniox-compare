@@ -13,7 +13,7 @@ export default defineConfig({
   },
   base: "/compare/ui/",
   server: {
-    allowedHosts: ["ec2-13-57-25-198.us-west-1.compute.amazonaws.com"],
+    allowedHosts: ["ec2-13-57-25-198.us-west-1.compute.amazonaws.com", "compare.speechmatics.cloud"],
     proxy: {
       "/compare/api/": {
         target: "http://127.0.0.1:8000",
