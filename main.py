@@ -428,10 +428,17 @@ async def list_videos():
                 .replace("_", " ")
                 .title()
             )
+            ref_files = list(folder.glob("*-ref.json"))
+            ref_url = (
+                f"/compare/videos/{folder.name}/{ref_files[0].name}"
+                if ref_files
+                else None
+            )
             videos.append({
                 "id": folder.name,
                 "name": display_name,
                 "url": f"/compare/videos/{folder.name}/{mp4_path.name}",
+                "refUrl": ref_url,
             })
     return {"videos": videos}
 

@@ -8,6 +8,7 @@ interface Video {
   id: string;
   name: string;
   url: string;
+  refUrl?: string;
 }
 
 export const VideoSection: React.FC = () => {

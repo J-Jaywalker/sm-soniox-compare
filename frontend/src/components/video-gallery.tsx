@@ -4,6 +4,7 @@ interface Video {
   id: string;
   name: string;
   url: string;
+  refUrl?: string;
 }
 
 const PREVIEW_SEGMENTS = [0.05, 0.2, 0.35, 0.5, 0.65, 0.8] as const;
@@ -17,7 +18,7 @@ interface VideoCardProps extends Video {
   onSelect?: (video: Video) => void;
 }
 
-const VideoCard: React.FC<VideoCardProps> = ({ id, name, url, onSelect }) => {
+const VideoCard: React.FC<VideoCardProps> = ({ id, name, url, refUrl, onSelect }) => {
   const videoRef = useRef<HTMLVideoElement>(null);
   const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const segmentIndexRef = useRef<number>(randomSegmentIndex());
@@ -84,7 +85,7 @@ const VideoCard: React.FC<VideoCardProps> = ({ id, name, url, onSelect }) => {
       className="rounded-[4px] border border-[#2e3330] bg-[#1d201f] overflow-hidden transition-colors duration-150 hover:border-[#29a383]/40 cursor-pointer"
       onMouseEnter={handleMouseEnter}
       onMouseLeave={handleMouseLeave}
-      onClick={() => onSelect?.({ id, name, url })}
+      onClick={() => onSelect?.({ id, name, url, refUrl })}
     >
       <div className="relative w-full" style={{ aspectRatio: "16 / 9" }}>
         <video
@@ -180,6 +181,7 @@ export const VideoGallery: React.FC<VideoGalleryProps> = ({ onSelect }) => {
                 id={video.id}
                 name={video.name}
                 url={video.url}
+                refUrl={video.refUrl}
                 onSelect={onSelect}
               />
             ))}
