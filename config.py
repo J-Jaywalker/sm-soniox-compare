@@ -24,7 +24,7 @@ def get_speechmatics_service_config():
     return ServiceConfig(
         provider_name="speechmatics",
         api_key=os.environ["SPEECHMATICS_API_KEY"],
-        websocket_url="wss://us.rt.api.speechmatics.com/v2",
+        websocket_url="wss://us.rt.speechmatics.com/v2",
         model="",
     )
 
