@@ -413,7 +413,7 @@ async def enroll_speaker(
             pass
 
 
-VIDEOS_DIR = Path(__file__).parent / "Videos"
+VIDEOS_DIR = Path(__file__).parent / "Demo Videos"
 
 
 @app.get("/compare/api/videos")
